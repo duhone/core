@@ -14,9 +14,15 @@ namespace CR
 {
 	namespace Core
 	{
+		template<typename FunctionT>
+		class MultiFunction {};
+
+		//no return type for multifunction, who would win?
 		template<typename ReturnType, typename... ArgTypes>
-		class MultiFunction
+		class MultiFunction<ReturnType (ArgTypes...)>
 		{
+			static_assert(std::is_same<ReturnType, void>::value,
+				"MultiFunction only works with void return type");
 		public:
 			typedef std::function<ReturnType(ArgTypes...)> OperationType;
 
@@ -28,29 +34,36 @@ namespace CR
 			{
 				m_operations.clear();
 			}
-			void operator=(OperationType& operation)
+			void operator=(OperationType operation)
 			{
 				*this = nullptr;
 				*this += operation;
 			}
-			void operator+=(OperationType& operation)
+			void operator+=(OperationType operation)
 			{
-				m_delegates.push_back(operation);
+				m_operations.push_back(operation);
 			}
-			void operator(ArgTypes... params)()
+			template<typename... ArgTypes>
+			void operator()(ArgTypes&&... params)
 			{
-				ForEach(m_operations, [](OperationType& operation){ operation(params...); });
+				for (auto& op : m_operations)
+				{
+					op(std::forward<ArgTypes>(params)...);
+				}
 			}
 			explicit operator bool() const
 			{
-				return AllOf(m_operations, [](OperationType& op) -> bool {return op});
+				return AllOf(m_operations, [](const OperationType& op) -> bool {return static_cast<bool>(op); });
 			}
 		private:
 			std::vector<OperationType> m_operations;
 		};
 
+		template<typename FunctionT>
+		class SelectableFunction {};
+
 		template<typename ReturnType, typename... ArgTypes>
-		class SelectableFunction
+		class SelectableFunction<ReturnType(ArgTypes...)>
 		{
 		public:
 			typedef std::function<ReturnType(ArgTypes...)> OperationType;
@@ -63,20 +76,30 @@ namespace CR
 			{
 				m_operations.clear();
 			}
-			void operator+=(OperationType& operation)
+			void operator=(OperationType operation)
 			{
-				m_delegates.push_back(operation);
+				*this = nullptr;
+				*this += operation;
 			}
-			void operator(ArgTypes... params)()
+			void operator+=(OperationType operation)
 			{
-				m_operations.at(m_currentOperation)(std::forward<params>...);
+				m_operations.push_back(operation);
+			}
+			template<typename... ArgTypes>
+			ReturnType operator()(ArgTypes&&... params)
+			{
+				return m_operations.at(m_currentOperation)(std::forward<ArgTypes>(params)...);
 			}
 			explicit operator bool() const
 			{
-				return m_operations.at(m_currentOperation);
+				return static_cast<bool>(m_operations.at(m_currentOperation));
 			}
 			void SetOperation(std::size_t op) { m_currentOperation = op; }
 
+			OperationType& operator[](std::size_t index)
+			{
+				return m_operations.at(index);
+			}
 		private:
 			std::vector<OperationType> m_operations;
 			std::size_t m_currentOperation{ 0 };

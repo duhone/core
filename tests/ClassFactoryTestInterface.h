@@ -14,4 +14,4 @@ public:
 	virtual int GetValue() const = 0;
 };
 
-typedef CR::Core::Singleton<CR::Core::ClassFactory<std::unique_ptr<TestInterface>, TestClasses, int> > TestFactory;
+typedef CR::Core::ClassFactory<std::unique_ptr<TestInterface>, TestClasses, int> TestFactory;

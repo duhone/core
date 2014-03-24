@@ -51,26 +51,18 @@ namespace CR
 			*/
 			static T& Instance()
 			{
-				std::call_once(m_onceFlag, [](){
-					//m_instance = std::make_unique<T>(); //would require making make_unique a friend of T too
-					m_instance = std::unique_ptr<T>(new T());
-				});
-				return *m_instance;
-			}					
+				//not thread safe in VS 2013, but should be. is fine in gcc and clang. need
+				//	to use meyers singleton to work with auto registration, so hopefully
+				//	microsoft fixes this eventually. call_once, and double check lock wont
+				//	work with auto registration because of unknown init time of member statics
+				static T instance;
+				return instance;
+			}	
 		private:
-			Singleton(void) = delete;
-			~Singleton(void) = delete;
+			~Singleton(void) = default;
+			Singleton(void) = default;
 			Singleton<T>(const Singleton<T>&) = delete;
 			Singleton<T>& operator=(const Singleton<T>&) = delete;
-
-			static std::unique_ptr<T> m_instance;
-			static std::once_flag m_onceFlag;
 		};
-
-		template<class T>
-		std::unique_ptr<T> Singleton<T>::m_instance;
-
-		template<class T>
-		std::once_flag Singleton<T>::m_onceFlag;
 	}
 }

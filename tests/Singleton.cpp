@@ -5,17 +5,16 @@ using namespace CR::Core;
 
 //namespace
 //{
-	class OnlyOne
+class OnlyOne : public Singleton<OnlyOne>
 	{
 	public:
 		friend Singleton<OnlyOne>;
-		friend std::unique_ptr<OnlyOne>;
 
 		void IncCount() { ++m_count; }
 		int GetCount() const { return m_count; }
 	private:
-		OnlyOne() {}
-		~OnlyOne() {}
+		OnlyOne() = default;
+		~OnlyOne() = default;
 		OnlyOne(const OnlyOne&) = delete;
 		OnlyOne(OnlyOne&&) = delete;
 		OnlyOne& operator=(const OnlyOne&) = delete;
@@ -25,11 +24,9 @@ using namespace CR::Core;
 //}
 
 TEST(SingletonTest, Basics) {
-	typedef Singleton<OnlyOne> MySingleton;
-
-	EXPECT_EQ(0, MySingleton::Instance().GetCount());
-	MySingleton::Instance().IncCount();
-	EXPECT_EQ(1, MySingleton::Instance().GetCount());
-	MySingleton::Instance().IncCount();
-	EXPECT_EQ(2, MySingleton::Instance().GetCount());
+	EXPECT_EQ(0, OnlyOne::Instance().GetCount());
+	OnlyOne::Instance().IncCount();
+	EXPECT_EQ(1, OnlyOne::Instance().GetCount());
+	OnlyOne::Instance().IncCount();
+	EXPECT_EQ(2, OnlyOne::Instance().GetCount());
 }

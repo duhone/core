@@ -48,6 +48,7 @@ if(IncludeTests)
 						"${PROJECT_SOURCE_DIR}/../tests/ClassFactoryTest1.cpp"
 						"${PROJECT_SOURCE_DIR}/../tests/ClassFactoryTest2.cpp"
 						"${PROJECT_SOURCE_DIR}/../tests/ClassFactory.cpp"
+						"${PROJECT_SOURCE_DIR}/../tests/Function.cpp"
 						"${PROJECT_SOURCE_DIR}/../tests/main.cpp")
 	target_include_directories(tests PRIVATE "${GtestInclude}")
 	target_link_libraries(tests gtest)

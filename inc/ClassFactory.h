@@ -28,9 +28,9 @@ namespace CR
 	namespace Core
 	{
 		template<typename Created, typename Key, typename... Args>
-		class ClassFactory 
+		class ClassFactory : public Singleton<ClassFactory<Created, Key, Args...>>
 		{
-			friend class Singleton<ClassFactory>;
+			friend class Singleton<ClassFactory<Created, Key, Args...>>;
 			typedef std::function<Created(Args...)> Creater;
 		public:
 			bool RegisterCreater(Key _key,Creater _creater)
