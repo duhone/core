@@ -47,5 +47,43 @@ namespace CR
 			_value = _container.back();
 			_container.pop_back();
 		}
+
+		template<typename Container>
+		void EraseRemove(Container& a_container, const typename Container::value_type& a_value)
+		{
+			a_container.erase(std::remove(std::begin(a_container), std::end(a_container), a_value), std::end(a_container));
+		}
+
+		template<typename Container, typename Predicate>
+		void EraseRemoveIf(Container& a_container, Predicate a_pred)
+		{
+			a_container.erase(std::remove_if(begin(a_container), end(a_container), a_pred), end(a_container));
+		}
+
+		template<typename Container, typename CompareT>
+		std::size_t SortedInsert(Container& a_container, const typename Container::value_type& a_item, CompareT a_compare)
+		{
+			auto it = std::begin(a_container);
+			for (; it != std::end(a_container); ++it)
+			{
+				if (a_compare(*it, a_item))
+					break;
+			}
+			it = a_container.insert(it, a_item);
+			return std::distance(a_container.begin(), it);
+		}
+
+		template<typename T>
+		std::size_t Size(const T& x)
+		{ 
+			return x.size();
+		}
+
+		template<typename T, std::size_t N>
+		std::size_t Size(const T(&x)[N])
+		{ 
+			return N;
+		}
+
 	}
 }
