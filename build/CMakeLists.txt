@@ -25,6 +25,7 @@ add_library(core OBJECT "${PROJECT_SOURCE_DIR}/../inc/algorithm.h"
 						"${PROJECT_SOURCE_DIR}/../inc/StringUtil.h"
 						"${PROJECT_SOURCE_DIR}/../inc/Timer.h"
 						"${PROJECT_SOURCE_DIR}/../inc/OnScopeExit.h"
+						"${PROJECT_SOURCE_DIR}/../inc/Locked.h"
 						"${PROJECT_SOURCE_DIR}/../src/StringUtil.cpp"
 						"${PROJECT_SOURCE_DIR}/../src/Timer.cpp")
 						
@@ -49,6 +50,7 @@ if(IncludeTests)
 						"${PROJECT_SOURCE_DIR}/../tests/ClassFactoryTest2.cpp"
 						"${PROJECT_SOURCE_DIR}/../tests/ClassFactory.cpp"
 						"${PROJECT_SOURCE_DIR}/../tests/Function.cpp"
+						"${PROJECT_SOURCE_DIR}/../tests/Locked.cpp"
 						"${PROJECT_SOURCE_DIR}/../tests/main.cpp")
 	target_include_directories(tests PRIVATE "${GtestInclude}")
 	target_link_libraries(tests gtest)
