@@ -25,6 +25,7 @@ TEST(Locked, Basics) {
 			});
 		}
 	});
+	//should crash or undefined behavior if Locked doesn't work
 	task1.wait();
 	task2.wait();
 
