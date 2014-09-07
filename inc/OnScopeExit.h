@@ -8,7 +8,7 @@ namespace CR
 	{
 		//!RAII class to automaticly execute code on scope exit
 		/*! Example usage:
-			
+
 		*/
 		class OnScopeExit
 		{

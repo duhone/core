@@ -12,13 +12,13 @@ namespace CR
 {
 	namespace Core
 	{
-		template<typename ValueType,typename ThisType>
+		template<typename ValueType, typename ThisType>
 		struct Property
 		{
-			typedef ValueType (ThisType::*GetterType)() const;
+			typedef ValueType(ThisType::*GetterType)() const;
 			typedef void (ThisType::*SetterType)(ValueType);
-			
-			void Init(ThisType *_this,GetterType _getter,SetterType _setter)
+
+			void Init(ThisType *_this, GetterType _getter, SetterType _setter)
 			{
 				m_this = _this;
 				m_getter = _getter;

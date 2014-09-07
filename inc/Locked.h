@@ -9,7 +9,7 @@ namespace CR
 		template<typename T>
 		class Locked
 		{
-		public:			
+		public:
 			template<typename OperationType>
 			auto operator()(OperationType a_operation) const -> typename std::result_of<OperationType(T&)>::type
 			{

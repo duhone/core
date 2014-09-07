@@ -21,11 +21,12 @@ add_library(core OBJECT "${PROJECT_SOURCE_DIR}/../inc/algorithm.h"
 						"${PROJECT_SOURCE_DIR}/../inc/Guid.h"
 						"${PROJECT_SOURCE_DIR}/../inc/Property.h"
 						"${PROJECT_SOURCE_DIR}/../inc/Singleton.h"
-						"${PROJECT_SOURCE_DIR}/../inc/Sorting.h"
 						"${PROJECT_SOURCE_DIR}/../inc/StringUtil.h"
 						"${PROJECT_SOURCE_DIR}/../inc/Timer.h"
 						"${PROJECT_SOURCE_DIR}/../inc/OnScopeExit.h"
 						"${PROJECT_SOURCE_DIR}/../inc/Locked.h"
+						"${PROJECT_SOURCE_DIR}/../inc/Concepts.h"
+						"${PROJECT_SOURCE_DIR}/../inc/DefaultOperators.h"
 						"${PROJECT_SOURCE_DIR}/../src/StringUtil.cpp"
 						"${PROJECT_SOURCE_DIR}/../src/Timer.cpp")
 						

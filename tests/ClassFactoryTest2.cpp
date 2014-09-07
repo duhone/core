@@ -2,7 +2,7 @@
 
 namespace
 {
-	class Class2 : public TestInterface
+	class Class2 final : public TestInterface
 	{
 	public:
 		Class2(int a_arg) : m_value(a_arg) {}
@@ -14,5 +14,5 @@ namespace
 		int m_value{ 0 };
 	};
 
-	const bool registered = TestFactory::Instance().RegisterCreater(TestClasses::Class2, [](int arg){return std::make_unique<Class2>(arg); });
+	const bool registered = TestFactory::Instance().RegisterCreator(TestClasses::Class2, [](int arg){return std::make_unique<Class2>(arg); });
 }

@@ -23,7 +23,7 @@ namespace CR
 				return static_cast<wchar_t>(_char);
 			}
 		};
-		
+
 
 		struct Convert
 		{
@@ -31,20 +31,20 @@ namespace CR
 			{
 				std::string result;
 				result.resize(_original.size());
-				Transform(_original,result,UnicodeToAscii());
+				Transform(_original, result, UnicodeToAscii());
 				return result;
 			}
 			std::wstring operator()(const std::string &_original)
 			{
 				std::wstring result;
 				result.resize(_original.size());
-				Transform(_original,result,AsciiToUnicode());
+				Transform(_original, result, AsciiToUnicode());
 				return result;
 			}
 		};
 
-		bool CaseInsensitiveCompare(const std::wstring &s1,const std::wstring &s2);
-		
+		bool CaseInsensitiveCompare(const std::wstring &s1, const std::wstring &s2);
+
 	}
 }
 

@@ -1,11 +1,11 @@
-#include "Singleton.h"
 #include "gtest/gtest.h"
+#include "Singleton.h"
 
 using namespace CR::Core;
 
 //namespace
 //{
-class OnlyOne : public Singleton<OnlyOne>
+class OnlyOne final : public Singleton<OnlyOne>
 	{
 	public:
 		friend Singleton<OnlyOne>;
@@ -18,6 +18,7 @@ class OnlyOne : public Singleton<OnlyOne>
 		OnlyOne(const OnlyOne&) = delete;
 		OnlyOne(OnlyOne&&) = delete;
 		OnlyOne& operator=(const OnlyOne&) = delete;
+		OnlyOne& operator=(OnlyOne&&) = delete;
 
 		int m_count{ 0 };
 	};

@@ -2,14 +2,15 @@
 #include <mutex>
 #include <atomic>
 #include <memory>
+#include "Concepts.h"
 
 namespace CR
 {
 	namespace Core
-	{		
+	{
 		//! Singleton base template class.
 		/*!
-			Derive from this class to create a Singleton class. Your derived class must be a friend of 
+			Derive from this class to create a Singleton class. Your derived class must be a friend of
 			this template. Make sure the constructor is private in your dervived
 			class to insure no one can create an instance of it, and other auto generated functions too.
 			You must have a no argument	constructor. No other constructors will be called.
@@ -22,33 +23,33 @@ namespace CR
 			class OnlyOne
 			{
 			public:
-				friend Singleton<OnlyOne>;
+			friend Singleton<OnlyOne>;
 
-				void IncCount() { ++m_count; }
-				int GetCount() const { return m_count; }
+			void IncCount() { ++m_count; }
+			int GetCount() const { return m_count; }
 			private:
-				OnlyOne() {}
-				OnlyOne(const OnlyOne&) = delete;
-				OnlyOne(OnlyOne&&) = delete;
-				OnlyOne& operator=(const OnlyOne&) = delete;
+			OnlyOne() {}
+			OnlyOne(const OnlyOne&) = delete;
+			OnlyOne(OnlyOne&&) = delete;
+			OnlyOne& operator=(const OnlyOne&) = delete;
 
-				int m_count{ 0 };
+			int m_count{ 0 };
 			};
 
 			typedef Singleton<OnlyOne> MySingleton;
 
 			MySingleton::Instance().Test();
 			\endverbatim
-		*/
-		template<class T>
+			*/
+		template<SemiRegular T>
 		class Singleton
-		{			
+		{
 		public:
 			//! Get the one and only instance
 			/*!
 				Returns the only instance of this Singleton class. Function is thread safe.
 				Always returns the same pointer.
-			*/
+				*/
 			static T& Instance()
 			{
 				//not thread safe in VS 2013, but should be. is fine in gcc and clang. need
@@ -57,7 +58,7 @@ namespace CR
 				//	work with auto registration because of unknown init time of member statics
 				static T instance;
 				return instance;
-			}	
+			}
 		private:
 			~Singleton(void) = default;
 			Singleton(void) = default;

@@ -1,5 +1,5 @@
-#include "Function.h"
 #include "gtest\gtest.h"
+#include "Function.h"
 
 TEST(Function, Basics) {
 	CR::Core::MultiFunction<void(int, int)> multiFunc;
@@ -34,5 +34,4 @@ TEST(Function, Basics) {
 	EXPECT_EQ(true, static_cast<bool>(selFunc));
 	test1 = selFunc(5, 6);
 	EXPECT_EQ(30, test1);
-
 }

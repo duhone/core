@@ -1,5 +1,5 @@
-#include "ClassFactoryTestInterface.h"
 #include "gtest\gtest.h"
+#include "ClassFactoryTestInterface.h"
 
 TEST(ClassFactory, Basics) {
 	auto class1 = TestFactory::Instance().Create(TestClasses::Class1, 356);

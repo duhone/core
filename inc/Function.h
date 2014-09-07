@@ -1,32 +1,33 @@
 /*
 similar to std::function
-both hold a list of functions. MultiFunction will call every assigned function when invoked. 
+both hold a list of functions. MultiFunction will call every assigned function when invoked.
 SelectableFunction will invoke a single one of its functions which can be independently selected.
- */
+*/
 #pragma once
 
 #include <vector>
 #include <algorithm>
 #include <functional>
 #include "Algorithm.h"
+#include "Concepts.h"
 
 namespace CR
 {
 	namespace Core
 	{
-		template<typename FunctionT>
+		template<Callable CallableT>
 		class MultiFunction {};
 
 		//no return type for multifunction, who would win?
-		template<typename ReturnType, typename... ArgTypes>
-		class MultiFunction<ReturnType (ArgTypes...)>
+		template<SemiRegular ReturnType, SemiRegular... ArgTypes>
+		class MultiFunction<ReturnType(ArgTypes...)>
 		{
 			static_assert(std::is_same<ReturnType, void>::value,
 				"MultiFunction only works with void return type");
 		public:
-			typedef std::function<ReturnType(ArgTypes...)> OperationType;
+			using OperationT = std::function<ReturnType(ArgTypes...)>;
 
-			std::size_t Size() const
+			std::size_t size() const
 			{
 				return m_operations.size();
 			}
@@ -34,41 +35,41 @@ namespace CR
 			{
 				m_operations.clear();
 			}
-			void operator=(OperationType operation)
+			void operator=(const OperationT& a_operation)
 			{
 				*this = nullptr;
-				*this += operation;
+				*this += a_operation;
 			}
-			void operator+=(OperationType operation)
+			void operator+=(const OperationT& a_operation)
 			{
-				m_operations.push_back(operation);
+				m_operations.push_back(a_operation);
 			}
-			template<typename... ArgTypes>
-			void operator()(ArgTypes&&... params)
+			template<SemiRegular... ArgTypes>
+			void operator()(ArgTypes&&... a_params)
 			{
 				for (auto& op : m_operations)
 				{
-					op(std::forward<ArgTypes>(params)...);
+					op(std::forward<ArgTypes>(a_params)...);
 				}
 			}
 			explicit operator bool() const
 			{
-				return AllOf(m_operations, [](const OperationType& op) -> bool {return static_cast<bool>(op); });
+				return AllOf(m_operations, [](const OperationT& a_op) -> bool {return static_cast<bool>(a_op); });
 			}
 		private:
-			std::vector<OperationType> m_operations;
+			std::vector<OperationT> m_operations;
 		};
 
-		template<typename FunctionT>
+		template<Callable CallableT>
 		class SelectableFunction {};
 
-		template<typename ReturnType, typename... ArgTypes>
+		template<SemiRegular ReturnType, SemiRegular... ArgTypes>
 		class SelectableFunction<ReturnType(ArgTypes...)>
 		{
 		public:
-			typedef std::function<ReturnType(ArgTypes...)> OperationType;
+			using OperationT = std::function<ReturnType(ArgTypes...)>;
 
-			std::size_t Size() const
+			std::size_t size() const
 			{
 				return m_operations.size();
 			}
@@ -76,33 +77,33 @@ namespace CR
 			{
 				m_operations.clear();
 			}
-			void operator=(OperationType operation)
+			void operator=(const OperationT& a_operation)
 			{
 				*this = nullptr;
-				*this += operation;
+				*this += a_operation;
 			}
-			void operator+=(OperationType operation)
+			void operator+=(const OperationT& a_operation)
 			{
-				m_operations.push_back(operation);
+				m_operations.push_back(a_operation);
 			}
-			template<typename... ArgTypes>
-			ReturnType operator()(ArgTypes&&... params)
+			template<SemiRegular... ArgTypes>
+			ReturnType operator()(ArgTypes&&... a_params)
 			{
-				return m_operations.at(m_currentOperation)(std::forward<ArgTypes>(params)...);
+				return m_operations.at(m_currentOperation)(std::forward<ArgTypes>(a_params)...);
 			}
 			explicit operator bool() const
 			{
 				return static_cast<bool>(m_operations.at(m_currentOperation));
 			}
-			void SetOperation(std::size_t op) { m_currentOperation = op; }
+			void SetOperation(std::size_t a_op) { m_currentOperation = a_op; }
 
-			OperationType& operator[](std::size_t index)
+			OperationT& operator[](std::size_t a_index)
 			{
-				return m_operations.at(index);
+				return m_operations.at(a_index);
 			}
 		private:
-			std::vector<OperationType> m_operations;
-			std::size_t m_currentOperation{ 0 };
+			std::vector<OperationT> m_operations;
+			std::size_t m_currentOperation{0};
 		};
 	}
 }
