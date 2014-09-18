@@ -1,5 +1,7 @@
 cmake_minimum_required (VERSION 2.6)
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y")
+
 ###############################################
 #options
 ###############################################
@@ -45,7 +47,7 @@ if(IncludeTests)
 	#unit tests
 	###############################################
 	add_executable(tests "${PROJECT_SOURCE_DIR}/../tests/Singleton.cpp"
-						"${PROJECT_SOURCE_DIR}/../tests/guid.cpp"
+						"${PROJECT_SOURCE_DIR}/../tests/Guid.cpp"
 						"${PROJECT_SOURCE_DIR}/../tests/ClassFactoryTestInterface.h"
 						"${PROJECT_SOURCE_DIR}/../tests/ClassFactoryTest1.cpp"
 						"${PROJECT_SOURCE_DIR}/../tests/ClassFactoryTest2.cpp"

@@ -1,6 +1,6 @@
 #pragma once
 #include<string>
-#include "Algorithm.h"
+#include "algorithm.h"
 
 namespace CR
 {
