@@ -3,6 +3,8 @@ project (core)
 
 find_package (GTest)
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y")
+
 ###############################################
 #options
 ###############################################
@@ -47,7 +49,7 @@ if(IncludeTests AND GTEST_FOUND)
 	#unit tests
 	###############################################
 	add_executable(tests "${PROJECT_SOURCE_DIR}/../tests/Singleton.cpp"
-						"${PROJECT_SOURCE_DIR}/../tests/guid.cpp"
+						"${PROJECT_SOURCE_DIR}/../tests/Guid.cpp"
 						"${PROJECT_SOURCE_DIR}/../tests/ClassFactoryTestInterface.h"
 						"${PROJECT_SOURCE_DIR}/../tests/ClassFactoryTest1.cpp"
 						"${PROJECT_SOURCE_DIR}/../tests/ClassFactoryTest2.cpp"
@@ -58,4 +60,3 @@ if(IncludeTests AND GTEST_FOUND)
 	target_include_directories(tests PRIVATE "${GtestInclude}")
 	include_directories(${GTEST_INCLUDE_DIRS})
 	target_link_libraries(tests ${GTEST_LIBRARIES})
-endif()

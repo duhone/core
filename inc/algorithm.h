@@ -88,7 +88,7 @@ namespace CR
 		std::size_t SortedInsert(ContainerT& a_container, const typename ContainerT::value_type& a_value,
 			CompareT a_compare)
 		{
-			auto it = std::upper_bound(begin(a_container), end(a_container), a_item, a_compare);
+            auto it = std::upper_bound(begin(a_container), end(a_container), a_value, a_compare);
 			it = a_container.insert(it, a_value);
 			return std::distance(a_container.begin(), it);
 		}
