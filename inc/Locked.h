@@ -11,7 +11,7 @@ namespace CR
 		{
 		public:
 			template<typename OperationType>
-			auto operator()(OperationType a_operation) const -> typename std::result_of<OperationType(T&)>::type
+			auto operator()(OperationType a_operation) const -> typename std::result_of<OperationType(const T&)>::type
 			{
 				std::unique_lock<std::mutex> lock(m_mutex);
 				//std::shared_lock<std::shared_timed_mutex> lock(m_mutex); //c++14
