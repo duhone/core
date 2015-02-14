@@ -1,7 +1,8 @@
-#include "gtest\gtest.h"
+#include "catch.hpp"
 #include "Function.h"
 
-TEST(Function, Basics) {
+TEST_CASE("function", "basic tests")
+{
 	CR::Core::MultiFunction<void(int, int)> multiFunc;
 	int test1 = 0;
 	int test2 = 0;
@@ -11,10 +12,10 @@ TEST(Function, Basics) {
 	multiFunc += [&](int arg1, int arg2) {
 		test2 = arg1*arg2;
 	};
-	EXPECT_EQ(true, static_cast<bool>(multiFunc));
+	REQUIRE(static_cast<bool>(multiFunc) == true);
 	multiFunc(2, 3);
-	EXPECT_EQ(5, test1);
-	EXPECT_EQ(6, test2);
+	REQUIRE(test1 == 5);
+	REQUIRE(test2 == 6);
 
 	test1 = 0;
 	test2 = 0;
@@ -26,12 +27,12 @@ TEST(Function, Basics) {
 		return arg1*arg2;
 	};
 	selFunc.SetOperation(0);
-	EXPECT_EQ(true, static_cast<bool>(selFunc));
+	REQUIRE(static_cast<bool>(selFunc) == true);
 	test1 = selFunc(5, 6);
-	EXPECT_EQ(11, test1);
+	REQUIRE(test1 == 11);
 
 	selFunc.SetOperation(1);
-	EXPECT_EQ(true, static_cast<bool>(selFunc));
+	REQUIRE(static_cast<bool>(selFunc) == true);
 	test1 = selFunc(5, 6);
-	EXPECT_EQ(30, test1);
+	REQUIRE(test1 == 30);
 }

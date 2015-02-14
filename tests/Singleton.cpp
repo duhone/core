@@ -1,10 +1,10 @@
-#include "gtest/gtest.h"
+#include "catch.hpp"
 #include "Singleton.h"
 
 using namespace CR::Core;
 
-//namespace
-//{
+namespace
+{
 class OnlyOne final : public Singleton<OnlyOne>
 	{
 	public:
@@ -22,12 +22,13 @@ class OnlyOne final : public Singleton<OnlyOne>
 
 		int m_count{ 0 };
 	};
-//}
+}
 
-TEST(SingletonTest, Basics) {
-	EXPECT_EQ(0, OnlyOne::Instance().GetCount());
+TEST_CASE("singleton", "basic tests")
+{
+	REQUIRE(OnlyOne::Instance().GetCount() == 0);
 	OnlyOne::Instance().IncCount();
-	EXPECT_EQ(1, OnlyOne::Instance().GetCount());
+	REQUIRE(OnlyOne::Instance().GetCount() == 1);
 	OnlyOne::Instance().IncCount();
-	EXPECT_EQ(2, OnlyOne::Instance().GetCount());
+	REQUIRE(OnlyOne::Instance().GetCount() == 2);
 }

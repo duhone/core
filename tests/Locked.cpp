@@ -1,4 +1,4 @@
-#include "gtest/gtest.h"
+#include "catch.hpp"
 #include "Locked.h"
 #include <future>
 #include <algorithm>
@@ -8,7 +8,8 @@
 using namespace std;
 using namespace CR::Core;
 
-TEST(Locked, Basics) {
+TEST_CASE("Locked", "basic tests")
+{
 	Locked<vector<int>> data;
 	
 	auto task1 = async(std::launch::async, [&](){
@@ -40,5 +41,5 @@ TEST(Locked, Basics) {
 	});
 	int result1 = task3.get();
 
-	EXPECT_EQ(99990000, result1);
+	REQUIRE(result1 == 99990000);
 }
