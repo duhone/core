@@ -27,6 +27,7 @@ add_library(core OBJECT "${PROJECT_SOURCE_DIR}/../inc/algorithm.h"
 						"${PROJECT_SOURCE_DIR}/../inc/Locked.h"
 						"${PROJECT_SOURCE_DIR}/../inc/Concepts.h"
 						"${PROJECT_SOURCE_DIR}/../inc/DefaultOperators.h"
+						"${PROJECT_SOURCE_DIR}/../inc/Tuple.h"
 						"${PROJECT_SOURCE_DIR}/../src/StringUtil.cpp"
 						"${PROJECT_SOURCE_DIR}/../src/Timer.cpp")
 						
