@@ -1,7 +1,7 @@
 cmake_minimum_required (VERSION 2.6)
 project (core)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y")
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y")
 
 ###############################################
 #options
@@ -30,7 +30,9 @@ add_library(core OBJECT "${PROJECT_SOURCE_DIR}/../inc/algorithm.h"
 						"${PROJECT_SOURCE_DIR}/../inc/Tuple.h"
 						"${PROJECT_SOURCE_DIR}/../src/StringUtil.cpp"
 						"${PROJECT_SOURCE_DIR}/../src/Timer.cpp")
-						
+					
+set_property(TARGET core APPEND PROPERTY COMPILE_FLAGS "-WX -W4")
+#set_property(TARGET core APPEND PROPERTY COMPILE_FLAGS "-Werror -Wall -Wextra")	
 				
 if(IncludeTests)  
 	###############################################
@@ -45,4 +47,8 @@ if(IncludeTests)
 						"${PROJECT_SOURCE_DIR}/../tests/Function.cpp"
 						"${PROJECT_SOURCE_DIR}/../tests/Locked.cpp"
 						"${PROJECT_SOURCE_DIR}/../tests/main.cpp")
+						
+	set_property(TARGET tests APPEND PROPERTY COMPILE_FLAGS "-WX -W4")
+	#set_property(TARGET tests APPEND PROPERTY COMPILE_FLAGS "-Werror -Wall -Wextra")
+
 endif()

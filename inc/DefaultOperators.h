@@ -15,12 +15,12 @@ struct DefaultOperatorsTotallyOrdered : public DefaultOperatorsRegular<T>
 {
 	bool operator<=(const T& a_other) const
 	{
-		return (*static_cast<const T*>(this) < a_other) || (*this == a_other);
+		return  !(a_other < *static_cast<const T*>(this));
 	}
 
 	bool operator>(const T& a_other) const
 	{
-		return !(*static_cast<const T*>(this) <= a_other);
+		return (a_other < *static_cast<const T*>(this));
 	}
 
 	bool operator>=(const T& a_other) const

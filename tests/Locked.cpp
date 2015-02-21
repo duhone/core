@@ -5,6 +5,7 @@
 #include <numeric>
 #include <vector>
 #include <list>
+#include <set>
 #include "algorithm.h"
 
 using namespace std;
@@ -82,4 +83,39 @@ TEST_CASE("Locked Multiple", "multiple types")
 
 	REQUIRE(get<0>(result1) == 45);
 	REQUIRE(get<1>(result1) == 90);
+}
+
+class SemiregularType
+{
+public:
+	SemiregularType() = default;
+	~SemiregularType() = default;
+	SemiregularType(const SemiregularType&) = default;
+	SemiregularType& operator=(const SemiregularType&) = default;
+
+private:
+	int m_data{0};
+};
+
+TEST_CASE("Locked Container", "Locked should be totatly ordered if contained types are totaly ordered")
+{
+	//This code should not compile. if Locked is holding a semi regular type, then locked should also 
+	//be semi regular and not work with a set.
+	//set<Locked<SemiregularType>> setOfLocksSemiregular;
+	//setOfLocksSemiregular.insert(Locked<SemiregularType>{});
+
+	//test locked can work with a TotalyOrdered type
+	set<Locked<int>> setOfLocks;
+	setOfLocks.insert(Locked<int>{2});
+	setOfLocks.insert(Locked<int>{10});
+	setOfLocks.insert(Locked<int>{15});
+
+	int sum = 0;
+	for(const auto& item : setOfLocks)
+	{
+		item([&](const auto& arg) {
+			sum += arg;
+		});
+	}
+	REQUIRE(sum == 27);
 }

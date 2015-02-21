@@ -14,19 +14,19 @@ namespace CR
 	namespace Core
 	{
 		template<Container ContainerT, Callable CallableT>
-		void ForEach(ContainerT& a_container, CallableT& a_callable)
+		void ForEach(ContainerT& a_container, CallableT a_callable)
 		{
 			std::for_each(std::begin(a_container), std::end(a_container), a_callable);
 		};
 
 		template<Container ContainerSrcT, Container ContainerDstT>
-		void Copy(const ContainerSrcT& a_src, ContainerDstT& a_dst)
+		void Copy(const ContainerSrcT& a_src, ContainerDstT a_dst)
 		{
 			std::copy(std::cbegin(a_src), std::cend(a_src), std::begin(a_dst));
 		};
 
 		template<Container ContainerSrcT, Container ContainerDstT, Callable CallableT>
-		void Transform(const ContainerSrcT& a_src, ContainerDstT& a_dst, CallableT& a_callable)
+		void Transform(const ContainerSrcT& a_src, ContainerDstT& a_dst, CallableT a_callable)
 		{
 			std::transform(std::cbegin(a_src), std::cend(a_src), std::begin(a_dst), a_callable);
 		};
@@ -52,13 +52,13 @@ namespace CR
 		}
 
 		template<Container ContainerT, Callable CallableT>
-		bool AllOf(ContainerT& a_container, CallableT& a_callable)
+		bool AllOf(ContainerT& a_container, CallableT a_callable)
 		{
 			return std::all_of(std::cbegin(a_container), std::cend(a_container), a_callable);
 		}
 
 		template<Container ContainerT, Callable CallableT>
-		bool AnyOf(ContainerT& a_container, CallableT& a_callable)
+		bool AnyOf(ContainerT& a_container, CallableT a_callable)
 		{
 			return std::any_of(std::cbegin(a_container), std::cend(a_container), a_callable);
 		}
