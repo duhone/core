@@ -34,8 +34,9 @@ namespace CR
 			}
 			Locked& operator=(Locked&& other)
 			{
-				std::unique_lock<std::mutex> lock(m_mutex);
-				std::unique_lock<std::mutex> lockOther(other.m_mutex);
+				std::unique_lock<std::mutex> lock1(m_mutex, std::defer_lock);
+				std::unique_lock<std::mutex> lock2(other.m_mutex, std::defer_lock);
+				std::lock(lock1, lock2);
 				m_instances = std::move(other.m_instances);
 			}
 
@@ -58,16 +59,20 @@ namespace CR
 				m_instances = std::move(arg);
 			}
 
-			bool operator==(const Locked& a_other) const
+			friend bool operator==(const Locked& a_arg1, const Locked& a_arg2)
 			{
-				std::unique_lock<std::mutex> lock(m_mutex);
-				return m_instances == a_other.m_instances;
+				std::unique_lock<std::mutex> lock1(a_arg1.m_mutex, std::defer_lock);
+				std::unique_lock<std::mutex> lock2(a_arg2.m_mutex, std::defer_lock);
+				std::lock(lock1, lock2);
+				return a_arg1.m_instances == a_arg2.m_instances;
 			}
 
-			bool operator<(const Locked& a_other) const
+			friend bool operator<(const Locked& a_arg1, const Locked& a_arg2)
 			{
-				std::unique_lock<std::mutex> lock(m_mutex);
-				return m_instances < a_other.m_instances;
+				std::unique_lock<std::mutex> lock1(a_arg1.m_mutex, std::defer_lock);
+				std::unique_lock<std::mutex> lock2(a_arg2.m_mutex, std::defer_lock);
+				std::lock(lock1, lock2);
+				return a_arg1.m_instances < a_arg2.m_instances;
 			}
 
 			template<Callable OperationType>
