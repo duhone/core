@@ -14,22 +14,14 @@ include_directories("${PROJECT_SOURCE_DIR}/../inc")
 ###############################################
 #library
 ###############################################
-add_library(core OBJECT "${PROJECT_SOURCE_DIR}/../inc/algorithm.h"
-						"${PROJECT_SOURCE_DIR}/../inc/ClassFactory.h"
-						"${PROJECT_SOURCE_DIR}/../inc/FSM.h"
-						"${PROJECT_SOURCE_DIR}/../inc/Function.h"
-						"${PROJECT_SOURCE_DIR}/../inc/Guid.h"
-						"${PROJECT_SOURCE_DIR}/../inc/Property.h"
-						"${PROJECT_SOURCE_DIR}/../inc/Singleton.h"
-						"${PROJECT_SOURCE_DIR}/../inc/StringUtil.h"
-						"${PROJECT_SOURCE_DIR}/../inc/Timer.h"
-						"${PROJECT_SOURCE_DIR}/../inc/OnScopeExit.h"
-						"${PROJECT_SOURCE_DIR}/../inc/Locked.h"
-						"${PROJECT_SOURCE_DIR}/../inc/Concepts.h"
-						"${PROJECT_SOURCE_DIR}/../inc/DefaultOperators.h"
-						"${PROJECT_SOURCE_DIR}/../inc/Tuple.h"
-						"${PROJECT_SOURCE_DIR}/../src/StringUtil.cpp"
-						"${PROJECT_SOURCE_DIR}/../src/Timer.cpp")
+file(GLOB_RECURSE core_inc "${PROJECT_SOURCE_DIR}/../inc/*.h")
+file(GLOB_RECURSE core_src1 "${PROJECT_SOURCE_DIR}/../src/*.h")
+file(GLOB_RECURSE core_src2 "${PROJECT_SOURCE_DIR}/../src/*.cpp")
+list(APPEND core_src ${core_inc})
+list(APPEND core_src ${core_src1})
+list(APPEND core_src ${core_src2})
+
+add_library(core OBJECT ${core_src})
 					
 set_property(TARGET core APPEND PROPERTY COMPILE_FLAGS "-WX -W4")
 #set_property(TARGET core APPEND PROPERTY COMPILE_FLAGS "-Werror -Wall -Wextra")	
@@ -38,17 +30,13 @@ if(IncludeTests)
 	###############################################
 	#unit tests
 	###############################################
-	add_executable(tests "${PROJECT_SOURCE_DIR}/../tests/Singleton.cpp"
-						"${PROJECT_SOURCE_DIR}/../tests/Guid.cpp"
-						"${PROJECT_SOURCE_DIR}/../tests/ClassFactoryTestInterface.h"
-						"${PROJECT_SOURCE_DIR}/../tests/ClassFactoryTest1.cpp"
-						"${PROJECT_SOURCE_DIR}/../tests/ClassFactoryTest2.cpp"
-						"${PROJECT_SOURCE_DIR}/../tests/ClassFactory.cpp"
-						"${PROJECT_SOURCE_DIR}/../tests/Function.cpp"
-						"${PROJECT_SOURCE_DIR}/../tests/Locked.cpp"
-						"${PROJECT_SOURCE_DIR}/../tests/main.cpp")
+	file(GLOB_RECURSE core_test_inc "${PROJECT_SOURCE_DIR}/../tests/*.h")
+	file(GLOB_RECURSE core_test_src1 "${PROJECT_SOURCE_DIR}/../tests/*.cpp")
+	list(APPEND core_test_src ${core_test_inc})
+	list(APPEND core_test_src ${core_test_src1})
+	
+	add_executable(core_tests $<TARGET_OBJECTS:core> ${core_test_src})
 						
-	set_property(TARGET tests APPEND PROPERTY COMPILE_FLAGS "-WX -W4")
+	set_property(TARGET core_tests APPEND PROPERTY COMPILE_FLAGS "-WX -W4")
 	#set_property(TARGET tests APPEND PROPERTY COMPILE_FLAGS "-Werror -Wall -Wextra")
-
 endif()
