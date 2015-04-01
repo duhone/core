@@ -9,7 +9,7 @@ project (core)
 
 option(IncludeTests "Include Unit Tests" ON)
 
-include_directories("${PROJECT_SOURCE_DIR}/../inc")
+include_directories("${PROJECT_SOURCE_DIR}/../inc/core")
 
 ###############################################
 #library
