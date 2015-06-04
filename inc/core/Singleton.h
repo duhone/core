@@ -44,6 +44,7 @@ namespace CR
 		template<SemiRegular T>
 		class Singleton
 		{
+			friend T;
 		public:
 			//! Get the one and only instance
 			/*!
@@ -52,9 +53,8 @@ namespace CR
 				*/
 			static T& Instance()
 			{
-				//not thread safe in VS 2013, but should be. is fine in gcc and clang. need
-				//	to use meyers singleton to work with auto registration, so hopefully
-				//	microsoft fixes this eventually. call_once, and double check lock wont
+				//not thread safe in VS 2013 and earlier, but is in VS2015. is fine in gcc and clang. need
+				//	to use meyers singleton to work with auto registration. Call_once, and double check lock wont
 				//	work with auto registration because of unknown init time of member statics
 				static T instance;
 				return instance;
@@ -63,7 +63,9 @@ namespace CR
 			~Singleton(void) = default;
 			Singleton(void) = default;
 			Singleton<T>(const Singleton<T>&) = delete;
+			Singleton<T>(Singleton<T>&&) = delete;
 			Singleton<T>& operator=(const Singleton<T>&) = delete;
+			Singleton<T>& operator=(Singleton<T>&&) = delete;
 		};
 	}
 }

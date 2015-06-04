@@ -127,7 +127,6 @@ namespace CR
 				};
 
 				auto cdata = reinterpret_cast<const unsigned short*>(m_data);
-				int index = 0;
 				//little endian
 				result += a_firstChar;
 				conversion(cdata[1]);
