@@ -119,3 +119,16 @@ TEST_CASE("Locked Container", "Locked should be totatly ordered if contained typ
 	}
 	REQUIRE(sum == 27);
 }
+
+TEST_CASE("lock multiple Lockeds", "")
+{
+	Locked<int> data1;
+	Locked<vector<int>> data2;
+
+	auto multiLock = MakeMultiLock(data1, data2);
+
+	multiLock([](auto& d1, auto& d2) {
+		d1 = 1;
+		d2.push_back(1);
+	});
+}

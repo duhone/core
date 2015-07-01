@@ -23,10 +23,10 @@ namespace CR
 		namespace Impl
 		{
 			template<typename, typename = void>
-			struct HasMember : public std::false_type {};
+			struct HasTypeMember : public std::false_type {};
 
 			template<typename T>
-			struct HasMember<T, void_t<typename T::type>> : public std::true_type{};
+			struct HasTypeMember<T, void_t<typename T::type>> : public std::true_type{};
 		}
 
 		/*
