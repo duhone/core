@@ -132,3 +132,74 @@ TEST_CASE("lock multiple Lockeds", "")
 		d2.push_back(1);
 	});
 }
+
+TEST_CASE("Locked try", "")
+{
+	Locked<vector<int>> data;
+
+	auto task1 = async(std::launch::async, [&]() {
+		for(int i = 0; i < 10000; ++i)
+		{
+			data.Try([i](auto& a_data) {
+				a_data.push_back(i);
+			});
+		}
+	});
+	auto task2 = async(std::launch::async, [&]() {
+		for(int i = 0; i < 10000; ++i)
+		{
+			data.Try([i](auto& a_data) {
+				a_data.push_back(i);
+			});
+		}
+	});
+	task1.wait();
+	task2.wait();
+
+	const auto& cdata = data;
+
+	auto task3 = async(std::launch::async, [&]() {
+		return cdata([](const auto& a_data) {
+			return accumulate(a_data, 0);
+		});
+	});
+	int result1 = task3.get();
+
+	//Surely some of the try locks should have failed in this case, skipping some of the adds.
+	REQUIRE(result1 != 99990000);
+}
+
+TEST_CASE("Locked try wait", "loops on try to make sure no iteration is missed")
+{
+	Locked<vector<int>> data;
+
+	auto task1 = async(std::launch::async, [&]() {
+		for(int i = 0; i < 10000; ++i)
+		{
+			while(!data.Try([i](auto& a_data) {
+				a_data.push_back(i);
+			}));
+		}
+	});
+	auto task2 = async(std::launch::async, [&]() {
+		for(int i = 0; i < 10000; ++i)
+		{
+			while(!data.Try([i](auto& a_data) {
+				a_data.push_back(i);
+			}));
+		}
+	});
+	task1.wait();
+	task2.wait();
+
+	const auto& cdata = data;
+
+	auto task3 = async(std::launch::async, [&]() {
+		return cdata([](const auto& a_data) {
+			return accumulate(a_data, 0);
+		});
+	});
+	int result1 = task3.get();
+
+	REQUIRE(result1 == 99990000);
+}

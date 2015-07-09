@@ -1,6 +1,10 @@
 cmake_minimum_required (VERSION 2.6)
 project (core)
 
+add_subdirectory("${PROJECT_SOURCE_DIR}/../../3rdParty/build" "${PROJECT_SOURCE_DIR}/../../3rdParty_build")
+include_directories("${PROJECT_SOURCE_DIR}/../../3rdParty/catch")
+include_directories("${PROJECT_SOURCE_DIR}/../../3rdParty/boost")
+
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y")
 
 ###############################################
@@ -37,6 +41,7 @@ if(IncludeTests)
 	
 	add_executable(core_tests $<TARGET_OBJECTS:core> ${core_test_src})
 						
+	set_property(TARGET core_tests APPEND PROPERTY FOLDER tests)
 	set_property(TARGET core_tests APPEND PROPERTY COMPILE_FLAGS "-WX -W4")
 	#set_property(TARGET tests APPEND PROPERTY COMPILE_FLAGS "-Werror -Wall -Wextra")
 endif()
