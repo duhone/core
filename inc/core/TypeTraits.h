@@ -40,6 +40,20 @@ namespace CR
 		struct is_copy_assignable<T, void_t<copy_assignment_t<T>>> : 
 			public std::is_same<copy_assignment_t<T>, T&>{};
 			*/
+
+		//converts std:function style definition to a function pointer type. i.e. from 
+		//something like int(float) to int(*)(float)
+		template<typename T>
+		struct GetFunctionPtrType;
+
+		template<typename RET, typename... Args>
+		struct GetFunctionPtrType<RET(Args...)>
+		{
+			using type = RET(*)(Args...);
+		};
+
+		template<typename T>
+		using GetFunctionPtrType_t = typename GetFunctionPtrType<T>::type;
 	}
 }
 
