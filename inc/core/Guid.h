@@ -114,6 +114,13 @@ namespace CR
 				return Convert<std::wstring::value_type, std::wstring::traits_type>(translation, L'{', L'-', L'}');
 			}
 
+			std::string ToStringClean() const
+			{
+				static const char translation[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+					'A', 'B', 'C', 'D', 'E', 'F'};
+				return Convert<std::string::value_type, std::string::traits_type>(translation, '\0', '\0', '\0');
+			}
+
 		private:
 			template<typename CharT, typename Traits>
 			std::basic_string<CharT, Traits> Convert(const CharT* a_translation, CharT a_firstChar, CharT a_seperatorChar, CharT a_lastChar) const
@@ -128,20 +135,26 @@ namespace CR
 
 				auto cdata = reinterpret_cast<const unsigned short*>(m_data);
 				//little endian
-				result += a_firstChar;
+				if(a_firstChar)
+					result += a_firstChar;
 				conversion(cdata[1]);
 				conversion(cdata[0]);
-				result += a_seperatorChar;
+				if(a_seperatorChar)
+					result += a_seperatorChar;
 				conversion(cdata[3]);
-				result += a_seperatorChar;
+				if(a_seperatorChar)
+					result += a_seperatorChar;
 				conversion(cdata[2]);
-				result += a_seperatorChar;
+				if(a_seperatorChar)
+					result += a_seperatorChar;
 				conversion(cdata[5]);
-				result += a_seperatorChar;
+				if(a_seperatorChar)
+					result += a_seperatorChar;
 				conversion(cdata[4]);
 				conversion(cdata[7]);
 				conversion(cdata[6]);
-				result += a_lastChar;
+				if(a_lastChar)
+					result += a_lastChar;
 				return result;
 			}
 
