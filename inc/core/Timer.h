@@ -1,5 +1,6 @@
 #pragma once
 #include<chrono>
+#include <string>
 
 namespace CR
 {
@@ -40,8 +41,18 @@ namespace CR
 			std::chrono::high_resolution_clock::time_point currenttime;
 
 			double timerFreqInv;
-			double totalTime;
-			double timeLastFrame;
+			double totalTime{ 0.0 };
+			double timeLastFrame{ 0.0 };
+		};
+
+		class ScopedTimer
+		{
+		public:
+			ScopedTimer(const char* text);
+			~ScopedTimer();
+		private:
+			Timer m_timer;
+			std::string m_text;
 		};
 	}
 }

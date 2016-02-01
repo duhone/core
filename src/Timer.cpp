@@ -1,4 +1,5 @@
 #include "Timer.h"
+#include <cstdio>
 
 using namespace std;
 using namespace CR::Core;
@@ -31,4 +32,16 @@ void Timer::Update()
 void Timer::StartFrame()
 {
 	starttime = chrono::high_resolution_clock::now();
+}
+
+
+ScopedTimer::ScopedTimer(const char* text) : m_text(text)
+{
+
+}
+
+ScopedTimer::~ScopedTimer()
+{
+	m_timer.Update();
+	printf("%s %0.2fms\n", m_text.c_str(), (m_timer.GetTotalTime()*1000));
 }
