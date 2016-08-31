@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <numeric>
 #include <vector>
+#include <initializer_list>
 #include "Concepts.h"
 
 namespace CR
@@ -117,6 +118,11 @@ namespace CR
 			typename ContainerT::value_type a_initialValue, CallableT a_callable)
 		{
 			return std::accumulate(std::cbegin(a_container), std::cend(a_container), a_initialValue, a_callable);
+		}
+		
+		template<Callable CallableT, typename... Ts>
+		void for_each_argument(CallableT&& a_callable, Ts&&... a_args) {
+			(void)std::initializer_list<int> {(a_callable(std::forward<Ts>(a_args)), 0)...};
 		}
 	}
 }
