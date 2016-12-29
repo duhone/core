@@ -11,49 +11,44 @@ SelectableFunction will invoke a single one of its functions which can be indepe
 #include "Algorithm.h"
 #include "Concepts.h"
 
-namespace CR
-{
-	namespace Core
-	{
+namespace CR {
+	namespace Core {
 		template<Callable CallableT>
 		class MultiFunction {};
 
 		//no return type for multifunction, who would win?
 		template<SemiRegular ReturnType, SemiRegular... ArgTypes>
-		class MultiFunction<ReturnType(ArgTypes...)>
-		{
+		class MultiFunction<ReturnType(ArgTypes...)> {
 			static_assert(std::is_same<ReturnType, void>::value,
-				"MultiFunction only works with void return type");
+						  "MultiFunction only works with void return type");
 		public:
 			using OperationT = std::function<ReturnType(ArgTypes...)>;
 
-			std::size_t size() const
-			{
+			std::size_t size() const {
 				return m_operations.size();
 			}
-			void operator=(std::nullptr_t)
-			{
+
+			void operator=(std::nullptr_t) {
 				m_operations.clear();
 			}
-			void operator=(const OperationT& a_operation)
-			{
+
+			void operator=(const OperationT& a_operation) {
 				*this = nullptr;
 				*this += a_operation;
 			}
-			void operator+=(const OperationT& a_operation)
-			{
+
+			void operator+=(const OperationT& a_operation) {
 				m_operations.push_back(a_operation);
 			}
-			template<SemiRegular... ArgTypes>
-			void operator()(ArgTypes&&... a_params)
-			{
-				for (auto& op : m_operations)
-				{
-					op(std::forward<ArgTypes>(a_params)...);
+
+			template<SemiRegular... FArgTypes>
+			void operator()(FArgTypes&&... a_params) {
+				for(auto& op : m_operations) {
+					op(std::forward<FArgTypes>(a_params)...);
 				}
 			}
-			explicit operator bool() const
-			{
+
+			explicit operator bool() const {
 				return AllOf(m_operations, [](const OperationT& a_op) -> bool {return static_cast<bool>(a_op); });
 			}
 		private:
@@ -64,41 +59,43 @@ namespace CR
 		class SelectableFunction {};
 
 		template<SemiRegular ReturnType, SemiRegular... ArgTypes>
-		class SelectableFunction<ReturnType(ArgTypes...)>
-		{
+		class SelectableFunction<ReturnType(ArgTypes...)> {
 		public:
 			using OperationT = std::function<ReturnType(ArgTypes...)>;
 
-			std::size_t size() const
-			{
+			std::size_t size() const {
 				return m_operations.size();
 			}
-			void operator=(std::nullptr_t)
-			{
+
+			void operator=(std::nullptr_t) {
 				m_operations.clear();
 			}
-			void operator=(const OperationT& a_operation)
-			{
+
+			void operator=(std::size_t a_op) {
+				SetOperation(a_op);
+			}
+
+			void operator=(const OperationT& a_operation) {
 				*this = nullptr;
 				*this += a_operation;
 			}
-			void operator+=(const OperationT& a_operation)
-			{
+
+			void operator+=(const OperationT& a_operation) {
 				m_operations.push_back(a_operation);
 			}
-			template<SemiRegular... ArgTypes>
-			ReturnType operator()(ArgTypes&&... a_params)
-			{
-				return m_operations.at(m_currentOperation)(std::forward<ArgTypes>(a_params)...);
+
+			template<SemiRegular... FArgTypes>
+			ReturnType operator()(FArgTypes&&... a_params) {
+				return m_operations.at(m_currentOperation)(std::forward<FArgTypes>(a_params)...);
 			}
-			explicit operator bool() const
-			{
+
+			explicit operator bool() const {
 				return static_cast<bool>(m_operations.at(m_currentOperation));
 			}
+
 			void SetOperation(std::size_t a_op) { m_currentOperation = a_op; }
 
-			OperationT& operator[](std::size_t a_index)
-			{
+			OperationT& operator[](std::size_t a_index) {
 				return m_operations.at(a_index);
 			}
 		private:
