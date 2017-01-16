@@ -1,0 +1,63 @@
+
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../inc")
+
+###############################################
+#library
+###############################################
+set(CORE_PUBLIC_HDRS
+    ${CMAKE_CURRENT_LIST_DIR}/../inc/core/algorithm.h
+    ${CMAKE_CURRENT_LIST_DIR}/../inc/core/ClassFactory.h
+    ${CMAKE_CURRENT_LIST_DIR}/../inc/core/Concepts.h
+    ${CMAKE_CURRENT_LIST_DIR}/../inc/core/DefaultOperators.h
+    ${CMAKE_CURRENT_LIST_DIR}/../inc/core/Function.h
+    ${CMAKE_CURRENT_LIST_DIR}/../inc/core/Guid.h
+    ${CMAKE_CURRENT_LIST_DIR}/../inc/core/literals.h
+    ${CMAKE_CURRENT_LIST_DIR}/../inc/core/Locked.h
+    ${CMAKE_CURRENT_LIST_DIR}/../inc/core/ScopeExit.h
+    ${CMAKE_CURRENT_LIST_DIR}/../inc/core/Singleton.h
+    ${CMAKE_CURRENT_LIST_DIR}/../inc/core/ScopeExit.h
+    ${CMAKE_CURRENT_LIST_DIR}/../inc/core/StringUtil.h
+    ${CMAKE_CURRENT_LIST_DIR}/../inc/core/Timer.h
+    ${CMAKE_CURRENT_LIST_DIR}/../inc/core/Tuple.h
+    ${CMAKE_CURRENT_LIST_DIR}/../inc/core/TypeTraits.h
+)
+
+set(CORE_SRCS
+    ${CMAKE_CURRENT_LIST_DIR}/../src/Misc.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/../src/StringUtil.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/../src/Timer.cpp
+)
+
+add_library(core OBJECT ${CORE_PUBLIC_HDRS} ${CORE_SRCS})
+					
+set_property(TARGET core APPEND PROPERTY COMPILE_FLAGS "-WX -W4 -std:c++latest")
+#set_property(TARGET core APPEND PROPERTY COMPILE_FLAGS "-Werror -Wall -Wextra")	
+		
+source_group("Public Headers" FILES ${CORE_PUBLIC_HDRS})
+source_group("Source" FILES ${CORE_SRCS})
+		
+if(IncludeTests)  
+	###############################################
+	#unit tests
+	###############################################
+set(CORE_TEST_SRCS
+    ${CMAKE_CURRENT_LIST_DIR}/../tests/ClassFactory.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/../tests/ClassFactoryTest1.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/../tests/ClassFactoryTest2.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/../tests/ClassFactoryTestInterface.h
+    ${CMAKE_CURRENT_LIST_DIR}/../tests/Function.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/../tests/Guid.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/../tests/Locked.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/../tests/main.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/../tests/Property.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/../tests/Singleton.cpp
+)
+	
+	add_executable(core_tests $<TARGET_OBJECTS:core> ${CORE_TEST_SRCS})
+						
+	source_group("Source" FILES ${CORE_TEST_SRCS})
+
+	set_property(TARGET core_tests APPEND PROPERTY FOLDER tests)
+	set_property(TARGET core_tests APPEND PROPERTY COMPILE_FLAGS "-WX -W4 -std:c++latest")
+	#set_property(TARGET tests APPEND PROPERTY COMPILE_FLAGS "-Werror -Wall -Wextra")
+endif()
