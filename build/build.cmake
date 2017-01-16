@@ -28,13 +28,15 @@ set(CORE_SRCS
     ${CMAKE_CURRENT_LIST_DIR}/../src/Timer.cpp
 )
 
-add_library(core OBJECT ${CORE_PUBLIC_HDRS} ${CORE_SRCS})
-					
-set_property(TARGET core APPEND PROPERTY COMPILE_FLAGS "-WX -W4 -std:c++latest")
-#set_property(TARGET core APPEND PROPERTY COMPILE_FLAGS "-Werror -Wall -Wextra")	
-		
+set(CORE_BUILD
+    ${CMAKE_CURRENT_LIST_DIR}/../build/build.cmake
+)
+
+add_library(core OBJECT ${CORE_PUBLIC_HDRS} ${CORE_SRCS} ${CORE_BUILD})
+	
 source_group("Public Headers" FILES ${CORE_PUBLIC_HDRS})
 source_group("Source" FILES ${CORE_SRCS})
+source_group("Build" FILES ${CORE_BUILD})
 		
 if(IncludeTests)  
 	###############################################
@@ -49,7 +51,6 @@ set(CORE_TEST_SRCS
     ${CMAKE_CURRENT_LIST_DIR}/../tests/Guid.cpp
     ${CMAKE_CURRENT_LIST_DIR}/../tests/Locked.cpp
     ${CMAKE_CURRENT_LIST_DIR}/../tests/main.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/../tests/Property.cpp
     ${CMAKE_CURRENT_LIST_DIR}/../tests/Singleton.cpp
 )
 	
@@ -58,6 +59,4 @@ set(CORE_TEST_SRCS
 	source_group("Source" FILES ${CORE_TEST_SRCS})
 
 	set_property(TARGET core_tests APPEND PROPERTY FOLDER tests)
-	set_property(TARGET core_tests APPEND PROPERTY COMPILE_FLAGS "-WX -W4 -std:c++latest")
-	#set_property(TARGET tests APPEND PROPERTY COMPILE_FLAGS "-Werror -Wall -Wextra")
 endif()
