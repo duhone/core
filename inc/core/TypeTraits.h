@@ -5,9 +5,6 @@ namespace CR
 {
 	namespace Core
 	{
-		template<typename...>
-		using void_t = void;
-
 		template<typename T, typename... Rest>
 		struct is_one_of;
 
@@ -26,7 +23,7 @@ namespace CR
 			struct HasTypeMember : public std::false_type {};
 
 			template<typename T>
-			struct HasTypeMember<T, void_t<typename T::type>> : public std::true_type{};
+			struct HasTypeMember<T, std::void_t<typename T::type>> : public std::true_type{};
 		}
 
 		/*
@@ -56,12 +53,3 @@ namespace CR
 		using GetFunctionPtrType_t = typename GetFunctionPtrType<T>::type;
 	}
 }
-
-
-/*
-template<typename...>
-struct voider { using type = void; }
-
-template<typename... T0toN>
-using void_t - typename voider<T0toN...>::type;
-*/
