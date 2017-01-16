@@ -31,14 +31,14 @@ namespace CR
 			{
 				std::string result;
 				result.resize(_original.size());
-				Transform(_original, result, UnicodeToAscii());
+				transform(_original, result, UnicodeToAscii());
 				return result;
 			}
 			std::wstring operator()(const std::string &_original)
 			{
 				std::wstring result;
 				result.resize(_original.size());
-				Transform(_original, result, AsciiToUnicode());
+				transform(_original, result, AsciiToUnicode());
 				return result;
 			}
 		};

@@ -1,5 +1,5 @@
 #include "catch.hpp"
-#include "algorithm.h"
+#include "core/algorithm.h"
 #include <vector>
 
 using namespace std;

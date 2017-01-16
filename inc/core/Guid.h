@@ -34,7 +34,7 @@ namespace CR
 
 			bool operator==(const Guid& a_other) const
 			{
-				return Equal(m_data, a_other.m_data);
+				return equal(m_data, a_other.m_data);
 			}
 
 			static Guid Null()

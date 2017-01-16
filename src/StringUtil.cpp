@@ -1,4 +1,4 @@
-#include "StringUtil.h"
+#include "core/StringUtil.h"
 
 bool CR::Core::CaseInsensitiveCompare(const std::wstring &s1, const std::wstring &s2)
 {

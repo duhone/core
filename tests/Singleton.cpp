@@ -1,5 +1,5 @@
 #include "catch.hpp"
-#include "Singleton.h"
+#include "core/Singleton.h"
 
 using namespace CR::Core;
 

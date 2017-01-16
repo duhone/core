@@ -1,5 +1,5 @@
 #include "catch.hpp"
-#include "Property.h"
+#include "core/Property.h"
 
 class PropertyTest
 {

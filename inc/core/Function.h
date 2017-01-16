@@ -49,7 +49,7 @@ namespace CR {
 			}
 
 			explicit operator bool() const {
-				return AllOf(m_operations, [](const OperationT& a_op) -> bool {return static_cast<bool>(a_op); });
+				return all_of(m_operations, [](const OperationT& a_op) -> bool {return static_cast<bool>(a_op); });
 			}
 		private:
 			std::vector<OperationT> m_operations;
@@ -86,7 +86,10 @@ namespace CR {
 
 			template<SemiRegular... FArgTypes>
 			ReturnType operator()(FArgTypes&&... a_params) {
-				return m_operations.at(m_currentOperation)(std::forward<FArgTypes>(a_params)...);
+				if (m_currentOperation >= 0 && m_currentOperation < m_operations.size()) {
+					return m_operations.at(m_currentOperation)(std::forward<FArgTypes>(a_params)...);
+				}
+				return ReturnType{};
 			}
 
 			explicit operator bool() const {

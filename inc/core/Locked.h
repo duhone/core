@@ -3,11 +3,11 @@
 //#include <shared_mutex>
 #include <functional>
 #include <tuple>
+#include <optional>
 #include "Concepts.h"
 #include "Tuple.h"
 #include "DefaultOperators.h"
 #include "ScopeExit.h"
-#include <boost/optional/optional.hpp>
 
 namespace CR
 {
@@ -100,20 +100,20 @@ namespace CR
 
 			template<Callable OperationType>
 			auto Try(OperationType a_operation) const -> std::enable_if_t<!std::is_void<std::result_of_t<OperationType(T&...)>>::value,
-													boost::optional<std::result_of_t<OperationType(T&...)>>>
+													std::optional<std::result_of_t<OperationType(T&...)>>>
 			{
 				if(!m_mutex.try_lock())
-					return boost::none;
+					return std::none;
 				std::unique_lock<std::mutex> lock(m_mutex, std::adopt_lock);
 				return std17::apply(a_operation, m_instances);
 			}
 
 			template<Callable OperationType>
 			auto Try(OperationType a_operation) -> std::enable_if_t<!std::is_void<std::result_of_t<OperationType(T&...)>>::value, 
-													boost::optional<std::result_of_t<OperationType(T&...)>>>
+													std::optional<std::result_of_t<OperationType(T&...)>>>
 			{
 				if(!m_mutex.try_lock())
-					return boost::none;
+					return std::none;
 				std::unique_lock<std::mutex> lock(m_mutex, std::adopt_lock);
 				return std17::apply(a_operation, m_instances);
 			}
@@ -175,10 +175,10 @@ namespace CR
 
 			template<Callable OperationType>
 			auto Try(OperationType a_operation) const -> std::enable_if_t<!std::is_void<std::result_of_t<OperationType(T&...)>>::value,
-				boost::optional<std::result_of_t<OperationType(T&...)>>>
+				std::optional<std::result_of_t<OperationType(T&...)>>>
 			{
 				if(!std17::apply(TryAcquireLock, m_locks))
-					return boost::none;
+					return std::none;
 				auto release = std17::make_scope_exit([this]() { std17::apply(ReleaseLocks, m_locks); });
 				auto data = std17::apply(BuildTuple, m_locks);
 				return std17::apply(a_operation, data);
@@ -186,10 +186,10 @@ namespace CR
 
 			template<Callable OperationType>
 			auto Try(OperationType a_operation) -> std::enable_if_t<!std::is_void<std::result_of_t<OperationType(T&...)>>::value,
-				boost::optional<std::result_of_t<OperationType(T&...)>>>
+				std::optional<std::result_of_t<OperationType(T&...)>>>
 			{
 				if(!std17::apply(TryAcquireLock, m_locks))
-					return boost::none;
+					return std::none;
 				auto release = std17::make_scope_exit([this]() { std17::apply(ReleaseLocks, m_locks); });
 				auto data = std17::apply(BuildTuple, m_locks);
 				return std17::apply(a_operation, data);

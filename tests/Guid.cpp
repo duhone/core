@@ -1,6 +1,6 @@
 #include "catch.hpp"
 #include <unordered_set>
-#include "Guid.h"
+#include "core/Guid.h"
 
 using namespace CR::Core;
 

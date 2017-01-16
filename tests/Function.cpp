@@ -1,5 +1,5 @@
 #include "catch.hpp"
-#include "Function.h"
+#include "core/Function.h"
 
 TEST_CASE("function", "basic tests")
 {

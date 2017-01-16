@@ -1,12 +1,12 @@
 #include "catch.hpp"
-#include "Locked.h"
+#include "core/Locked.h"
 #include <future>
 #include <algorithm>
 #include <numeric>
 #include <vector>
 #include <list>
 #include <set>
-#include "algorithm.h"
+#include "core/algorithm.h"
 
 using namespace std;
 using namespace CR::Core;
