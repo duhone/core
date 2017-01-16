@@ -15,15 +15,12 @@ set(CORE_PUBLIC_HDRS
     ${CMAKE_CURRENT_LIST_DIR}/../inc/core/Locked.h
     ${CMAKE_CURRENT_LIST_DIR}/../inc/core/ScopeExit.h
     ${CMAKE_CURRENT_LIST_DIR}/../inc/core/Singleton.h
-    ${CMAKE_CURRENT_LIST_DIR}/../inc/core/ScopeExit.h
     ${CMAKE_CURRENT_LIST_DIR}/../inc/core/StringUtil.h
     ${CMAKE_CURRENT_LIST_DIR}/../inc/core/Timer.h
-    ${CMAKE_CURRENT_LIST_DIR}/../inc/core/Tuple.h
     ${CMAKE_CURRENT_LIST_DIR}/../inc/core/TypeTraits.h
 )
 
 set(CORE_SRCS
-    ${CMAKE_CURRENT_LIST_DIR}/../src/Misc.cpp
     ${CMAKE_CURRENT_LIST_DIR}/../src/StringUtil.cpp
     ${CMAKE_CURRENT_LIST_DIR}/../src/Timer.cpp
 )
@@ -52,6 +49,7 @@ set(CORE_TEST_SRCS
     ${CMAKE_CURRENT_LIST_DIR}/../tests/Locked.cpp
     ${CMAKE_CURRENT_LIST_DIR}/../tests/main.cpp
     ${CMAKE_CURRENT_LIST_DIR}/../tests/Singleton.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/../tests/Misc.cpp
 )
 	
 	add_executable(core_tests $<TARGET_OBJECTS:core> ${CORE_TEST_SRCS})
