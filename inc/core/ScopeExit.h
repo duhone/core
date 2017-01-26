@@ -2,27 +2,22 @@
 #include<vector>
 #include<functional>
 
-namespace std17
-{
+namespace std17 {
 	template <typename EF>
-	struct scope_exit
-	{
+	struct scope_exit {
 		// construction
 		explicit
 			scope_exit(EF &&f) noexcept
 			:exit_function(std::move(f))
-			, execute_on_destruction{true}
-		{}
+			, execute_on_destruction{true} {}
 		// move
 		scope_exit(scope_exit  &&rhs) noexcept
 			: exit_function(std::move(rhs.exit_function))
-			, execute_on_destruction{rhs.execute_on_destruction}
-		{
+			, execute_on_destruction{rhs.execute_on_destruction} {
 			rhs.release();
 		}
 		// release
-		~scope_exit() noexcept(noexcept(this->exit_function()))
-		{
+		~scope_exit() noexcept(noexcept(this->exit_function())) {
 			if(execute_on_destruction)
 				this->exit_function();
 		}
@@ -36,14 +31,12 @@ namespace std17
 		// exposition only
 	};
 	template <typename EF>
-	auto make_scope_exit(EF &&exit_function) noexcept
-	{
+	auto make_scope_exit(EF &&exit_function) noexcept {
 		return scope_exit<std::remove_reference_t<EF>>(std::forward<EF>(exit_function));
 	}
 
 	template<typename R, typename D>
-	class unique_resource
-	{
+	class unique_resource {
 		R resource;
 		D deleter;
 		bool execute_on_destruction;
@@ -57,19 +50,16 @@ namespace std17
 			unique_resource(R && resource, D && deleter, bool shouldrun = true) noexcept
 			: resource(std::move(resource))
 			, deleter(std::move(deleter))
-			, execute_on_destruction{shouldrun}
-		{}
+			, execute_on_destruction{shouldrun} {}
 		// move
 		unique_resource(unique_resource &&other) noexcept
 			: resource(std::move(other.resource))
 			, deleter(std::move(other.deleter))
-			, execute_on_destruction{other.execute_on_destruction}
-		{
+			, execute_on_destruction{other.execute_on_destruction} {
 			other.release();
 		}
 		unique_resource&
-			operator=(unique_resource  &&other) noexcept(noexcept(this->reset()))
-		{
+			operator=(unique_resource  &&other) noexcept(noexcept(this->reset())) {
 			this->reset();
 			this->deleter = std::move(other.deleter);
 			this->resource = std::move(other.resource);
@@ -78,67 +68,55 @@ namespace std17
 			return *this;
 		}
 		// resource release
-		~unique_resource() noexcept(noexcept(this->reset()))
-		{
+		~unique_resource() noexcept(noexcept(this->reset())) {
 			this->reset();
 		}
-		void reset() noexcept(noexcept(this->get_deleter()(resource)))
-		{
-			if(execute_on_destruction)
-			{
+		void reset() noexcept(noexcept(this->get_deleter()(resource))) {
+			if(execute_on_destruction) {
 				this->execute_on_destruction = false;
 				this->get_deleter()(resource);
 			}
 		}
-		void reset(R && newresource) noexcept(noexcept(this->reset()))
-		{
+		void reset(R && newresource) noexcept(noexcept(this->reset())) {
 			this->reset();
 			this->resource = std::move(newresource);
 			this->execute_on_destruction = true;
 		}
-		R const & release() noexcept
-		{
+		R const & release() noexcept {
 			this->execute_on_destruction = false;
 			return this->get();
 		}
 		// resource access
-		R const & get() const noexcept
-		{
+		R const & get() const noexcept {
 			return this->resource;
 		}
-		operator R const &() const noexcept
-		{
+		operator R const &() const noexcept {
 			return this->resource;
 		}
 		R
-			operator->() const noexcept
-		{
+			operator->() const noexcept {
 			return this->resource;
 		}
 		std::add_lvalue_reference_t <
 			std::remove_pointer_t < R >>
-			operator*() const
-		{
+			operator*() const {
 			return *this->resource;
 		}
 		// deleter access
-		const D& get_deleter() const noexcept
-		{
+		const D& get_deleter() const noexcept {
 			return this->deleter;
 		}
 	};
 	//factories
 	template<typename R, typename D>
-	auto make_unique_resource(R && r, D &&d) noexcept
-	{
+	auto make_unique_resource(R && r, D &&d) noexcept {
 		return unique_resource<R, std::remove_reference_t<D>>(
 			std::move(r)
 			, std::forward<std::remove_reference_t<D>>(d)
 			, true);
 	}
 	template<typename R, typename D>
-	auto make_unique_resource_checked(R r, R invalid, D d) noexcept
-	{
+	auto make_unique_resource_checked(R r, R invalid, D d) noexcept {
 		bool shouldrun = not bool(r == invalid);
 		return unique_resource<R, D>(std::move(r), std::move(d), shouldrun);
 	}
