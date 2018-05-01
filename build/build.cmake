@@ -14,7 +14,6 @@ set(CORE_PUBLIC_HDRS
     ${CMAKE_CURRENT_LIST_DIR}/../inc/core/literals.h
     ${CMAKE_CURRENT_LIST_DIR}/../inc/core/Locked.h
     ${CMAKE_CURRENT_LIST_DIR}/../inc/core/ScopeExit.h
-    ${CMAKE_CURRENT_LIST_DIR}/../inc/core/Singleton.h
     ${CMAKE_CURRENT_LIST_DIR}/../inc/core/StringUtil.h
     ${CMAKE_CURRENT_LIST_DIR}/../inc/core/Timer.h
     ${CMAKE_CURRENT_LIST_DIR}/../inc/core/TypeTraits.h
@@ -44,11 +43,11 @@ set(CORE_TEST_SRCS
     ${CMAKE_CURRENT_LIST_DIR}/../tests/ClassFactoryTest1.cpp
     ${CMAKE_CURRENT_LIST_DIR}/../tests/ClassFactoryTest2.cpp
     ${CMAKE_CURRENT_LIST_DIR}/../tests/ClassFactoryTestInterface.h
+    ${CMAKE_CURRENT_LIST_DIR}/../tests/ClassFactoryTestInterface.cpp
     ${CMAKE_CURRENT_LIST_DIR}/../tests/Function.cpp
     ${CMAKE_CURRENT_LIST_DIR}/../tests/Guid.cpp
     ${CMAKE_CURRENT_LIST_DIR}/../tests/Locked.cpp
     ${CMAKE_CURRENT_LIST_DIR}/../tests/main.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/../tests/Singleton.cpp
     ${CMAKE_CURRENT_LIST_DIR}/../tests/Misc.cpp
 )
 	

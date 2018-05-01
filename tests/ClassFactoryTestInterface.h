@@ -1,5 +1,5 @@
 #pragma once
-#include "core/ClassFactory.h"
+#include <functional>
 
 enum class TestClasses
 {
@@ -14,4 +14,6 @@ public:
 	virtual int GetValue() const = 0;
 };
 
-using TestFactory = CR::Core::ClassFactory<std::unique_ptr<TestInterface>, TestClasses, int>;
+bool RegisterCreator(TestClasses classType, std::function<std::unique_ptr<TestInterface>(int)> creater);
+std::unique_ptr<TestInterface> CreateInstance(TestClasses classType, int value);
+

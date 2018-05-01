@@ -21,15 +21,20 @@
 #include <memory>
 #include <unordered_map>
 #include <exception>
-#include "core/Singleton.h"
 #include "core/Concepts.h"
 
 namespace CR::Core {
 	template<SemiRegular Created, Regular Key, typename... ArgTypes>
-	class ClassFactory : public Singleton<ClassFactory<Created, Key, ArgTypes...>> {
-		friend class Singleton<ClassFactory<Created, Key, ArgTypes...>>;
+	class ClassFactory {
 		using Creator = std::function<Created(ArgTypes...)>;
 	public:
+    ClassFactory() = default;
+    ClassFactory(const ClassFactory&) = delete;
+    ClassFactory(ClassFactory&&) = delete;
+    ~ClassFactory() = default;
+    ClassFactory& operator=(const ClassFactory&) = delete;
+    ClassFactory& operator=(ClassFactory&&) = delete;
+
 		bool RegisterCreator(Key a_key, Creator a_creator) {
 			m_creators.insert(std::make_pair(a_key, a_creator));
 			return true;
@@ -43,13 +48,7 @@ namespace CR::Core {
 				return (iterator->second)(std::forward<ArgTypesF>(a_args)...);
 		}
 
-	private:
-		ClassFactory() = default;
-		ClassFactory(const ClassFactory&) = delete;
-		ClassFactory(ClassFactory&&) = delete;
-		virtual ~ClassFactory() = default;
-		ClassFactory& operator=(const ClassFactory&) = delete;
-		ClassFactory& operator=(ClassFactory&&) = delete;
+  private:
 		std::unordered_map<Key, Creator> m_creators;
 	};
 }

@@ -14,5 +14,5 @@ namespace
 		int m_value{ 0 };
 	};
 
-	const bool registered = TestFactory::Instance().RegisterCreator(TestClasses::Class2, [](int arg){return std::make_unique<Class2>(arg); });
+	const bool registered = RegisterCreator(TestClasses::Class2, [](int arg){return std::make_unique<Class2>(arg); });
 }
