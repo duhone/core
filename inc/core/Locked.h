@@ -20,21 +20,21 @@ namespace CR::Core {
 		Locked() = default;
 		~Locked() = default;
 		Locked(const Locked& other) {
-			std::shared_lock<std::shared_timed_mutex> lockOther(other.m_mutex);
+			std::shared_lock lockOther(other.m_mutex);
 			m_instances(other.m_instances);
 		}
 		Locked& operator=(const Locked& other) {
-			std::unique_lock<std::shared_timed_mutex> lock(m_mutex);
-			std::shared_lock<std::shared_timed_mutex> lockOther(other.m_mutex);
+			std::unique_lock<std::shared_mutex> lock(m_mutex);
+			std::shared_lock<std::shared_mutex> lockOther(other.m_mutex);
 			m_instances = other.m_instances;
 		}
 		Locked(Locked&& other) {
-			std::unique_lock<std::shared_timed_mutex> lockOther(other.m_mutex);
+			std::unique_lock<std::shared_mutex> lockOther(other.m_mutex);
 			m_instances = std::move(other.m_instances);
 		}
 		Locked& operator=(Locked&& other) {
-			std::unique_lock<std::shared_timed_mutex> lock1(m_mutex, std::defer_lock);
-			std::unique_lock<std::shared_timed_mutex> lock2(other.m_mutex, std::defer_lock);
+			std::unique_lock<std::shared_mutex> lock1(m_mutex, std::defer_lock);
+			std::unique_lock<std::shared_mutex> lock2(other.m_mutex, std::defer_lock);
 			std::lock(lock1, lock2);
 			m_instances = std::move(other.m_instances);
 		}
@@ -46,78 +46,82 @@ namespace CR::Core {
 			m_instances = std::make_tuple(args...);
 		}
 		Locked& operator=(const std::tuple<T...>& arg) {
-			std::unique_lock<std::shared_timed_mutex> lock(m_mutex);
+			std::unique_lock<std::shared_mutex> lock(m_mutex);
 			m_instances = arg;
 		}
 		Locked& operator=(std::tuple<T...>&& arg) {
-			std::unique_lock<std::shared_timed_mutex> lock(m_mutex);
+			std::unique_lock<std::shared_mutex> lock(m_mutex);
 			m_instances = std::move(arg);
 		}
 
 		friend bool operator==(const Locked& a_arg1, const Locked& a_arg2) {
-			std::shared_lock<std::shared_timed_mutex> lock1(a_arg1.m_mutex, std::defer_lock);
-			std::shared_lock<std::shared_timed_mutex> lock2(a_arg2.m_mutex, std::defer_lock);
+			std::shared_lock<std::shared_mutex> lock1(a_arg1.m_mutex, std::defer_lock);
+			std::shared_lock<std::shared_mutex> lock2(a_arg2.m_mutex, std::defer_lock);
 			std::lock(lock1, lock2);
 			return a_arg1.m_instances == a_arg2.m_instances;
 		}
 
 		friend bool operator<(const Locked& a_arg1, const Locked& a_arg2) {
-			std::shared_lock<std::shared_timed_mutex> lock1(a_arg1.m_mutex, std::defer_lock);
-			std::shared_lock<std::shared_timed_mutex> lock2(a_arg2.m_mutex, std::defer_lock);
+			std::shared_lock<std::shared_mutex> lock1(a_arg1.m_mutex, std::defer_lock);
+			std::shared_lock<std::shared_mutex> lock2(a_arg2.m_mutex, std::defer_lock);
 			std::lock(lock1, lock2);
 			return a_arg1.m_instances < a_arg2.m_instances;
 		}
 
 		template<Callable OperationType>
 		auto operator()(OperationType a_operation) const {
-			std::shared_lock<std::shared_timed_mutex> lock(m_mutex);
+			std::shared_lock<std::shared_mutex> lock(m_mutex);
 			return std::apply(a_operation, m_instances);
 		}
 
 		template<Callable OperationType>
 		auto operator()(OperationType a_operation) {
-			std::unique_lock<std::shared_timed_mutex> lock(m_mutex);
+			std::unique_lock<std::shared_mutex> lock(m_mutex);
 			return std::apply(a_operation, m_instances);
 		}
 
-		template<Callable OperationType>
-		auto Try(OperationType a_operation) const -> std::enable_if_t<!std::is_void<std::result_of_t<OperationType(T&...)>>::value,
-			std::optional<std::result_of_t<OperationType(T&...)>>> {
-			if(!m_mutex.try_lock())
-				return std::none;
-			std::shared_lock<std::shared_timed_mutex> lock(m_mutex, std::adopt_lock);
-			return std::apply(a_operation, m_instances);
-		}
+    template<Callable OperationType>
+    auto Try(OperationType a_operation) const {
+      constexpr bool voidFunc = std::is_void_v<decltype(std::apply(a_operation, m_instances))>;
+      if (!m_mutex.try_lock()) {
+        if constexpr(voidFunc) {
+          return false;
+        } else {
+          return std::none;
+        }
+      }
+      std::shared_lock<std::shared_mutex> lock(m_mutex, std::adopt_lock);
 
-		template<Callable OperationType>
-		auto Try(OperationType a_operation) -> std::enable_if_t<!std::is_void<std::result_of_t<OperationType(T&...)>>::value,
-			std::optional<std::result_of_t<OperationType(T&...)>>> {
-			if(!m_mutex.try_lock())
-				return std::none;
-			std::unique_lock<std::shared_timed_mutex> lock(m_mutex, std::adopt_lock);
-			return std::apply(a_operation, m_instances);
-		}
+      if constexpr(voidFunc) {
+        std::apply(a_operation, m_instances);
+        return true;
+      } else {
+        return std::apply(a_operation, m_instances);
+      }
+    }
 
-		template<Callable OperationType>
-		auto Try(OperationType a_operation) const -> std::enable_if_t<std::is_void<std::result_of_t<OperationType(T&...)>>::value, bool> {
-			if(!m_mutex.try_lock())
-				return false;
-			std::shared_lock<std::shared_timed_mutex> lock(m_mutex, std::adopt_lock);
-			std::apply(a_operation, m_instances);
-			return true
-		}
+    template<Callable OperationType>
+    auto Try(OperationType a_operation) {
+      constexpr bool voidFunc = std::is_void_v<decltype(std::apply(a_operation, m_instances))>;
+      if (!m_mutex.try_lock()) {
+        if constexpr(voidFunc) {
+          return false;
+        } else {
+          return std::none;
+        }
+      }
+      std::unique_lock<std::shared_mutex> lock(m_mutex, std::adopt_lock);
 
-		template<Callable OperationType>
-		auto Try(OperationType a_operation) -> std::enable_if_t<std::is_void<std::result_of_t<OperationType(T&...)>>::value, bool> {
-			if(!m_mutex.try_lock())
-				return false;
-			std::unique_lock<std::shared_timed_mutex> lock(m_mutex, std::adopt_lock);
-			std::apply(a_operation, m_instances);
-			return true;
-		}
+      if constexpr(voidFunc) {
+        std::apply(a_operation, m_instances);
+        return true;
+      } else {
+        return std::apply(a_operation, m_instances);
+      }
+    }
 	private:
 		std::tuple<T...> m_instances;
-		mutable std::shared_timed_mutex m_mutex; //c++14
+		mutable std::shared_mutex m_mutex;
 	};
 
 	template<SemiRegular... T>
@@ -148,8 +152,8 @@ namespace CR::Core {
 		}
 
 		template<Callable OperationType>
-		auto Try(OperationType a_operation) const -> std::enable_if_t<!std::is_void<std::result_of_t<OperationType(T&...)>>::value,
-			std::optional<std::result_of_t<OperationType(T&...)>>> {
+		auto Try(OperationType a_operation) const -> std::enable_if_t<!std::is_void<std::invoke_result_t<OperationType(T&...)>>::value,
+			std::optional<std::invoke_result_t<OperationType(T&...)>>> {
 			if(!std::apply(TryAcquireLock, m_locks))
 				return std::none;
 			auto release = std17::make_scope_exit([this]() { std17::apply(ReleaseLocks, m_locks); });
@@ -158,8 +162,8 @@ namespace CR::Core {
 		}
 
 		template<Callable OperationType>
-		auto Try(OperationType a_operation) -> std::enable_if_t<!std::is_void<std::result_of_t<OperationType(T&...)>>::value,
-			std::optional<std::result_of_t<OperationType(T&...)>>> {
+		auto Try(OperationType a_operation) -> std::enable_if_t<!std::is_void<std::invoke_result_t<OperationType(T&...)>>::value,
+			std::optional<std::invoke_result_t<OperationType(T&...)>>> {
 			if(!std::apply(TryAcquireLock, m_locks))
 				return std::none;
 			auto release = std17::make_scope_exit([this]() { std17::apply(ReleaseLocks, m_locks); });
@@ -168,8 +172,8 @@ namespace CR::Core {
 		}
 
 		template<Callable OperationType>
-		auto Try(OperationType a_operation) const -> std::enable_if_t<std::is_void<std::result_of_t<OperationType(T&...)>>::value, bool> {
-			if(!std17::apply(TryAcquireLock, m_locks))
+		auto Try(OperationType a_operation) const -> std::enable_if_t<std::is_void<std::invoke_result_t<OperationType(T&...)>>::value, bool> {
+			if(!std::apply(TryAcquireLock, m_locks))
 				return false;
 			auto release = std17::make_scope_exit([this]() { std17::apply(ReleaseLocks, m_locks); });
 			auto data = std17::apply(BuildTuple, m_locks);
@@ -178,8 +182,8 @@ namespace CR::Core {
 		}
 
 		template<Callable OperationType>
-		auto Try(OperationType a_operation) -> std::enable_if_t<std::is_void<std::result_of_t<OperationType(T&...)>>::value, bool> {
-			if(!std17::apply(TryAcquireLock, m_locks))
+		auto Try(OperationType a_operation) -> std::enable_if_t<std::is_void<std::invoke_result_t<OperationType(T&...)>>::value, bool> {
+			if(!std::apply(TryAcquireLock, m_locks))
 				return false;
 			auto release = std17::make_scope_exit([this]() { std17::apply(ReleaseLocks, m_locks); });
 			auto data = std17::apply(BuildTuple, m_locks);

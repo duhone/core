@@ -18,7 +18,7 @@ namespace CR::Core {
 	//no return type for multifunction, who would win?
 	template<SemiRegular ReturnType, SemiRegular... ArgTypes>
 	class MultiFunction<ReturnType(ArgTypes...)> {
-		static_assert(std::is_same<ReturnType, void>::value,
+		static_assert(std::is_same_v<ReturnType, void>,
 					  "MultiFunction only works with void return type");
 	public:
 		using OperationT = std::function<ReturnType(ArgTypes...)>;
@@ -48,7 +48,7 @@ namespace CR::Core {
 		}
 
 		explicit operator bool() const {
-			return all_of(m_operations, [](const OperationT& a_op) -> bool {return static_cast<bool>(a_op); });
+			return all_of(m_operations, [](const OperationT& a_op) { return static_cast<bool>(a_op); });
 		}
 	private:
 		std::vector<OperationT> m_operations;

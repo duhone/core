@@ -1,5 +1,5 @@
 /*
-	versions of <algorithm> that operate on an entire container. for convienence
+	versions of <algorithm> that operate on an entire container. for convenience
 	and a few utilities
 	*/
 #pragma once
