@@ -54,7 +54,7 @@ TEST_CASE("Reflection", "") {
 
   REQUIRE(!HasFuncionDot_v<Vector2, Vector3>);
   REQUIRE(HasFuncionDot_v<Vector3, Vector3>);
-  REQUIRE(!HasFuncionFoo_v<Vector2>); //dont have a foo taking no arguments
+  REQUIRE(!HasFuncionFoo_v<Vector2>); //dont have a foo taking any arguments
   REQUIRE(HasFuncionFoo_v<Vector2, float>); //do have one taking one float argument
   REQUIRE(HasFuncionFoo_v<Vector3>);
   REQUIRE(!HasFuncionFoo_v<Vector3, float>);
