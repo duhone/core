@@ -17,6 +17,7 @@ set(CORE_PUBLIC_HDRS
     ${CMAKE_CURRENT_LIST_DIR}/../inc/core/StringUtil.h
     ${CMAKE_CURRENT_LIST_DIR}/../inc/core/Timer.h
     ${CMAKE_CURRENT_LIST_DIR}/../inc/core/TypeTraits.h
+    ${CMAKE_CURRENT_LIST_DIR}/../inc/core/Reflection.h
 )
 
 set(CORE_SRCS
@@ -49,6 +50,7 @@ set(CORE_TEST_SRCS
     ${CMAKE_CURRENT_LIST_DIR}/../tests/Locked.cpp
     ${CMAKE_CURRENT_LIST_DIR}/../tests/main.cpp
     ${CMAKE_CURRENT_LIST_DIR}/../tests/Misc.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/../tests/Reflection.cpp
 )
 	
 	add_executable(core_tests $<TARGET_OBJECTS:core> ${CORE_TEST_SRCS})
