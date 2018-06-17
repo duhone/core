@@ -1,14 +1,14 @@
 /*
-	versions of <algorithm> that operate on an entire container. for convenience
-	and a few utilities
-	*/
+    versions of <algorithm> that operate on an entire container. for convenience
+    and a few utilities
+    */
 #pragma once
-#include <map>
+#include "core/Concepts.h"
 #include <algorithm>
+#include <initializer_list>
+#include <map>
 #include <numeric>
 #include <vector>
-#include <initializer_list>
-#include "core/Concepts.h"
 
 namespace CR::Core {
 	template<Container ContainerT, Callable CallableT>
@@ -33,14 +33,14 @@ namespace CR::Core {
 
 	template<Container ContainerT1, Container ContainerT2>
 	bool equal(const ContainerT1& a_container1, const ContainerT2& a_container2) {
-		return std::equal(std::cbegin(a_container1), std::cend(a_container1),
-						  std::cbegin(a_container2), std::cend(a_container2));
+		return std::equal(std::cbegin(a_container1), std::cend(a_container1), std::cbegin(a_container2),
+		                  std::cend(a_container2));
 	}
 
 	template<Container ContainerT1, Container ContainerT2, Predicate PredicateT>
 	bool equal(const ContainerT1& a_container1, const ContainerT2& a_container2, PredicateT a_predicate) {
-		return std::equal(std::cbegin(a_container1), std::cend(a_container1),
-						  std::begin(a_container2), std::cend(a_container2), a_predicate);
+		return std::equal(std::cbegin(a_container1), std::cend(a_container1), std::begin(a_container2),
+		                  std::cend(a_container2), a_predicate);
 	}
 
 	template<Container ContainerT, Callable CallableT>
@@ -61,38 +61,36 @@ namespace CR::Core {
 
 	template<Container ContainerT>
 	void EraseRemove(ContainerT& a_container, const typename ContainerT::value_type& a_value) {
-		a_container.erase(std::remove(std::begin(a_container), std::end(a_container), a_value),
-						  std::end(a_container));
+		a_container.erase(std::remove(std::begin(a_container), std::end(a_container), a_value), std::end(a_container));
 	}
 
 	template<Container ContainerT, Predicate PredicateT>
 	void EraseRemoveIf(ContainerT& a_container, PredicateT a_predicate) {
-		a_container.erase(std::remove_if(begin(a_container), end(a_container), a_predicate),
-						  end(a_container));
+		a_container.erase(std::remove_if(begin(a_container), end(a_container), a_predicate), end(a_container));
 	}
 
 	template<Container ContainerT, Comparator CompareT>
 	std::size_t SortedInsert(ContainerT& a_container, const typename ContainerT::value_type& a_value,
-							 CompareT a_compare) {
+	                         CompareT a_compare) {
 		auto it = std::upper_bound(begin(a_container), end(a_container), a_value, a_compare);
-		it = a_container.insert(it, a_value);
+		it      = a_container.insert(it, a_value);
 		return std::distance(a_container.begin(), it);
 	}
 
 	template<Container ContainerT>
 	typename ContainerT::value_type accumulate(const ContainerT& a_container,
-											   typename ContainerT::value_type a_initialValue) {
+	                                           typename ContainerT::value_type a_initialValue) {
 		return std::accumulate(std::cbegin(a_container), std::cend(a_container), a_initialValue);
 	}
 
 	template<Container ContainerT, Callable CallableT>
 	typename ContainerT::value_type accumulate(const ContainerT& a_container,
-											   typename ContainerT::value_type a_initialValue, CallableT a_callable) {
+	                                           typename ContainerT::value_type a_initialValue, CallableT a_callable) {
 		return std::accumulate(std::cbegin(a_container), std::cend(a_container), a_initialValue, a_callable);
 	}
 
 	template<Callable CallableT, typename... Ts>
 	void for_each_argument(CallableT&& a_callable, Ts&&... a_args) {
-		(void)std::initializer_list<int> {(a_callable(std::forward<Ts>(a_args)), 0)...};
+		(void)std::initializer_list<int>{(a_callable(std::forward<Ts>(a_args)), 0)...};
 	}
-}
+}    // namespace CR::Core

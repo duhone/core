@@ -1,39 +1,41 @@
 /*
-	example use
-	enum class Shapes
-	{
-	Circle,
-	Box
-	};
-	typedef Singleton<ClassFactory<IShape,Shapes, float> > shapeFactory;
-	//use anonomous namespace so this part isnt accesable. and use const bool trick to register your creater
-	namespace
-	{
-	const bool registered = shapeFactor::Instance().RegisterCreater(Shapes::Circle, [](float arg){return new Circle(arg);});
-	}
+    example use
+    enum class Shapes
+    {
+    Circle,
+    Box
+    };
+    typedef Singleton<ClassFactory<IShape,Shapes, float> > shapeFactory;
+    //use anonomous namespace so this part isnt accesable. and use const bool trick to register your creater
+    namespace
+    {
+    const bool registered = shapeFactor::Instance().RegisterCreater(Shapes::Circle, [](float arg){return new
+   Circle(arg);});
+    }
 
-	//then in other code to use
-	IShape* shape = chapeFactory.Create(Shapes::Circle, 1.0f);
-	*/
+    //then in other code to use
+    IShape* shape = chapeFactory.Create(Shapes::Circle, 1.0f);
+    */
 #pragma once
 
+#include "core/Concepts.h"
+#include <exception>
 #include <functional>
 #include <memory>
 #include <unordered_map>
-#include <exception>
-#include "core/Concepts.h"
 
 namespace CR::Core {
 	template<SemiRegular Created, Regular Key, typename... ArgTypes>
 	class ClassFactory {
 		using Creator = std::function<Created(ArgTypes...)>;
-	public:
-    ClassFactory() = default;
-    ClassFactory(const ClassFactory&) = delete;
-    ClassFactory(ClassFactory&&) = delete;
-    ~ClassFactory() = default;
-    ClassFactory& operator=(const ClassFactory&) = delete;
-    ClassFactory& operator=(ClassFactory&&) = delete;
+
+	  public:
+		ClassFactory()                    = default;
+		ClassFactory(const ClassFactory&) = delete;
+		ClassFactory(ClassFactory&&)      = delete;
+		~ClassFactory()                   = default;
+		ClassFactory& operator=(const ClassFactory&) = delete;
+		ClassFactory& operator=(ClassFactory&&) = delete;
 
 		bool RegisterCreator(Key a_key, Creator a_creator) {
 			m_creators.insert(std::make_pair(a_key, a_creator));
@@ -48,7 +50,7 @@ namespace CR::Core {
 				return (iterator->second)(std::forward<ArgTypesF>(a_args)...);
 		}
 
-  private:
+	  private:
 		std::unordered_map<Key, Creator> m_creators;
 	};
-}
+}    // namespace CR::Core

@@ -1,12 +1,12 @@
 #pragma once
-#include <mutex>
-#include <shared_mutex>
-#include <functional>
-#include <tuple>
-#include <optional>
 #include "core/Concepts.h"
 #include "core/DefaultOperators.h"
 #include "core/ScopeExit.h"
+#include <functional>
+#include <mutex>
+#include <optional>
+#include <shared_mutex>
+#include <tuple>
 
 namespace CR::Core {
 	template<SemiRegular... T>
@@ -16,8 +16,9 @@ namespace CR::Core {
 	class Locked : public DefaultOperatorsTotallyOrdered<Locked<T...>> {
 		template<SemiRegular... T>
 		friend class MultiLock;
-	public:
-		Locked() = default;
+
+	  public:
+		Locked()  = default;
 		~Locked() = default;
 		Locked(const Locked& other) {
 			std::shared_lock lockOther(other.m_mutex);
@@ -39,12 +40,8 @@ namespace CR::Core {
 			m_instances = std::move(other.m_instances);
 		}
 
-		Locked(const T&... args) {
-			m_instances = std::make_tuple(args...);
-		}
-		Locked(T&&... args) {
-			m_instances = std::make_tuple(args...);
-		}
+		Locked(const T&... args) { m_instances = std::make_tuple(args...); }
+		Locked(T&&... args) { m_instances = std::make_tuple(args...); }
 		Locked& operator=(const std::tuple<T...>& arg) {
 			std::unique_lock<std::shared_mutex> lock(m_mutex);
 			m_instances = arg;
@@ -80,66 +77,67 @@ namespace CR::Core {
 			return std::apply(a_operation, m_instances);
 		}
 
-    template<Callable OperationType>
-    auto Try(OperationType a_operation) const {
-      constexpr bool voidFunc = std::is_void_v<decltype(std::apply(a_operation, m_instances))>;
-      if (!m_mutex.try_lock()) {
-        if constexpr(voidFunc) {
-          return false;
-        } else {
-          return std::none;
-        }
-      }
-      std::shared_lock<std::shared_mutex> lock(m_mutex, std::adopt_lock);
+		template<Callable OperationType>
+		auto Try(OperationType a_operation) const {
+			constexpr bool voidFunc = std::is_void_v<decltype(std::apply(a_operation, m_instances))>;
+			if(!m_mutex.try_lock()) {
+				if constexpr(voidFunc) {
+					return false;
+				} else {
+					return std::none;
+				}
+			}
+			std::shared_lock<std::shared_mutex> lock(m_mutex, std::adopt_lock);
 
-      if constexpr(voidFunc) {
-        std::apply(a_operation, m_instances);
-        return true;
-      } else {
-        return std::apply(a_operation, m_instances);
-      }
-    }
+			if constexpr(voidFunc) {
+				std::apply(a_operation, m_instances);
+				return true;
+			} else {
+				return std::apply(a_operation, m_instances);
+			}
+		}
 
-    template<Callable OperationType>
-    auto Try(OperationType a_operation) {
-      constexpr bool voidFunc = std::is_void_v<decltype(std::apply(a_operation, m_instances))>;
-      if (!m_mutex.try_lock()) {
-        if constexpr(voidFunc) {
-          return false;
-        } else {
-          return std::none;
-        }
-      }
-      std::unique_lock<std::shared_mutex> lock(m_mutex, std::adopt_lock);
+		template<Callable OperationType>
+		auto Try(OperationType a_operation) {
+			constexpr bool voidFunc = std::is_void_v<decltype(std::apply(a_operation, m_instances))>;
+			if(!m_mutex.try_lock()) {
+				if constexpr(voidFunc) {
+					return false;
+				} else {
+					return std::none;
+				}
+			}
+			std::unique_lock<std::shared_mutex> lock(m_mutex, std::adopt_lock);
 
-      if constexpr(voidFunc) {
-        std::apply(a_operation, m_instances);
-        return true;
-      } else {
-        return std::apply(a_operation, m_instances);
-      }
-    }
-	private:
+			if constexpr(voidFunc) {
+				std::apply(a_operation, m_instances);
+				return true;
+			} else {
+				return std::apply(a_operation, m_instances);
+			}
+		}
+
+	  private:
 		std::tuple<T...> m_instances;
 		mutable std::shared_mutex m_mutex;
 	};
 
 	template<SemiRegular... T>
 	class MultiLock {
-	public:
-		MultiLock() = delete; //doesn't make sense to create one of these with no child locks
+	  public:
+		MultiLock() = delete;    // doesn't make sense to create one of these with no child locks
 		MultiLock(Locked<T>&... a_arg) : m_locks(a_arg...) {}
-		~MultiLock() = default;
+		~MultiLock()          = default;
 		MultiLock(MultiLock&) = delete;
 		MultiLock& operator=(MultiLock&) = delete;
-		MultiLock(MultiLock&&) = default;
+		MultiLock(MultiLock&&)           = default;
 		MultiLock& operator=(MultiLock&&) = default;
 
 		template<Callable OperationType>
 		auto operator()(OperationType a_operation) const {
 			std17::apply(AcquireLock, m_locks);
 			auto release = std17::make_scope_exit([this]() { std17::apply(ReleaseLocks, m_locks); });
-			auto data = std17::apply(BuildTuple, m_locks);
+			auto data    = std17::apply(BuildTuple, m_locks);
 			return std17::apply(a_operation, data);
 		}
 
@@ -147,57 +145,54 @@ namespace CR::Core {
 		auto operator()(OperationType a_operation) {
 			std::apply(AcquireLock, m_locks);
 			auto release = std17::make_scope_exit([this]() { std::apply(ReleaseLocks, m_locks); });
-			auto data = std::apply(BuildTuple, m_locks);
+			auto data    = std::apply(BuildTuple, m_locks);
 			return std::apply(a_operation, data);
 		}
 
 		template<Callable OperationType>
-		auto Try(OperationType a_operation) const -> std::enable_if_t<!std::is_void<std::invoke_result_t<OperationType(T&...)>>::value,
-			std::optional<std::invoke_result_t<OperationType(T&...)>>> {
-			if(!std::apply(TryAcquireLock, m_locks))
-				return std::none;
+		auto Try(OperationType a_operation) const
+		    -> std::enable_if_t<!std::is_void<std::invoke_result_t<OperationType(T&...)>>::value,
+		                        std::optional<std::invoke_result_t<OperationType(T&...)>>> {
+			if(!std::apply(TryAcquireLock, m_locks)) return std::none;
 			auto release = std17::make_scope_exit([this]() { std17::apply(ReleaseLocks, m_locks); });
-			auto data = std::apply(BuildTuple, m_locks);
+			auto data    = std::apply(BuildTuple, m_locks);
 			return std::apply(a_operation, data);
 		}
 
 		template<Callable OperationType>
-		auto Try(OperationType a_operation) -> std::enable_if_t<!std::is_void<std::invoke_result_t<OperationType(T&...)>>::value,
-			std::optional<std::invoke_result_t<OperationType(T&...)>>> {
-			if(!std::apply(TryAcquireLock, m_locks))
-				return std::none;
+		auto Try(OperationType a_operation)
+		    -> std::enable_if_t<!std::is_void<std::invoke_result_t<OperationType(T&...)>>::value,
+		                        std::optional<std::invoke_result_t<OperationType(T&...)>>> {
+			if(!std::apply(TryAcquireLock, m_locks)) return std::none;
 			auto release = std17::make_scope_exit([this]() { std17::apply(ReleaseLocks, m_locks); });
-			auto data = std::apply(BuildTuple, m_locks);
+			auto data    = std::apply(BuildTuple, m_locks);
 			return std::apply(a_operation, data);
 		}
 
 		template<Callable OperationType>
-		auto Try(OperationType a_operation) const -> std::enable_if_t<std::is_void<std::invoke_result_t<OperationType(T&...)>>::value, bool> {
-			if(!std::apply(TryAcquireLock, m_locks))
-				return false;
+		auto Try(OperationType a_operation) const
+		    -> std::enable_if_t<std::is_void<std::invoke_result_t<OperationType(T&...)>>::value, bool> {
+			if(!std::apply(TryAcquireLock, m_locks)) return false;
 			auto release = std17::make_scope_exit([this]() { std17::apply(ReleaseLocks, m_locks); });
-			auto data = std17::apply(BuildTuple, m_locks);
+			auto data    = std17::apply(BuildTuple, m_locks);
 			std17::apply(a_operation, data);
 			return true;
 		}
 
 		template<Callable OperationType>
-		auto Try(OperationType a_operation) -> std::enable_if_t<std::is_void<std::invoke_result_t<OperationType(T&...)>>::value, bool> {
-			if(!std::apply(TryAcquireLock, m_locks))
-				return false;
+		auto Try(OperationType a_operation)
+		    -> std::enable_if_t<std::is_void<std::invoke_result_t<OperationType(T&...)>>::value, bool> {
+			if(!std::apply(TryAcquireLock, m_locks)) return false;
 			auto release = std17::make_scope_exit([this]() { std17::apply(ReleaseLocks, m_locks); });
-			auto data = std17::apply(BuildTuple, m_locks);
+			auto data    = std17::apply(BuildTuple, m_locks);
 			std17::apply(a_operation, data);
 			return true;
 		}
-	private:
-		static void AcquireLock(Locked<T>&... a_locks) {
-			std::lock(a_locks.m_mutex...);
-		}
 
-		static bool TryAcquireLock(Locked<T>&... a_locks) {
-			return std::try_lock(a_locks.m_mutex...) != -1;
-		}
+	  private:
+		static void AcquireLock(Locked<T>&... a_locks) { std::lock(a_locks.m_mutex...); }
+
+		static bool TryAcquireLock(Locked<T>&... a_locks) { return std::try_lock(a_locks.m_mutex...) != -1; }
 
 		template<SemiRegular FirstT>
 		static void ReleaseMutex(FirstT& a_first) {
@@ -210,9 +205,7 @@ namespace CR::Core {
 			ReleaseMutex(a_rest...);
 		}
 
-		static void ReleaseLocks(Locked<T>&... a_locks) {
-			ReleaseMutex(a_locks.m_mutex...);
-		}
+		static void ReleaseLocks(Locked<T>&... a_locks) { ReleaseMutex(a_locks.m_mutex...); }
 
 		template<SemiRegular FirstType>
 		static void ReleaseLock(Locked<FirstType>& a_first) {
@@ -225,15 +218,13 @@ namespace CR::Core {
 			ReleaseLock(a_rest);
 		}
 
-		static auto BuildTuple(Locked<T>&... a_locks) {
-			return std::tuple_cat(a_locks.m_instances...);
-		}
+		static auto BuildTuple(Locked<T>&... a_locks) { return std::tuple_cat(a_locks.m_instances...); }
 
 		std::tuple<Locked<T>&...> m_locks;
 	};
 
 	template<SemiRegular... T>
 	MultiLock<T...> MakeMultiLock(Locked<T>&... a_arg) {
-		return MultiLock<T...>{ a_arg... };
+		return MultiLock<T...>{a_arg...};
 	}
-}
+}    // namespace CR::Core

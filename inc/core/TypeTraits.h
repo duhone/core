@@ -20,7 +20,7 @@ namespace CR::Core {
 
 		template<typename T>
 		struct HasTypeMember<T, std::void_t<typename T::type>> : public std::true_type {};
-	}
+	}    // namespace Impl
 
 	/*
 	template<typename T>
@@ -31,19 +31,19 @@ namespace CR::Core {
 
 	template<typename T>
 	struct is_copy_assignable<T, void_t<copy_assignment_t<T>>> :
-		public std::is_same<copy_assignment_t<T>, T&>{};
-		*/
+	    public std::is_same<copy_assignment_t<T>, T&>{};
+	    */
 
-		//converts std:function style definition to a function pointer type. i.e. from 
-		//something like int(float) to int(*)(float)
+	// converts std:function style definition to a function pointer type. i.e. from
+	// something like int(float) to int(*)(float)
 	template<typename T>
 	struct GetFunctionPtrType;
 
 	template<typename RET, typename... Args>
 	struct GetFunctionPtrType<RET(Args...)> {
-		using type = RET(*)(Args...);
+		using type = RET (*)(Args...);
 	};
 
 	template<typename T>
 	using GetFunctionPtrType_t = typename GetFunctionPtrType<T>::type;
-}
+}    // namespace CR::Core

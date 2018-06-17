@@ -7,10 +7,8 @@ using namespace CR::Core;
 
 TEST_CASE("for_each_argument", "") {
 	vector<int> squares;
-	auto square = [&](auto value) {
-		squares.emplace_back(value*value);
-	};
-	
+	auto square = [&](auto value) { squares.emplace_back(value * value); };
+
 	for_each_argument(square, 0, 1, 2, 5, 10);
 
 	REQUIRE(squares[0] == 0);

@@ -1,15 +1,14 @@
 #include "catch.hpp"
 #include "core/Guid.h"
-#include <unordered_set>
 #include <set>
 #include <sstream>
+#include <unordered_set>
 
 using namespace CR::Core;
 
-TEST_CASE("guid", "basic tests")
-{
-	auto nullGuid = Guid::Null();	
-	REQUIRE(nullGuid == Guid( 0, 0, 0, 0 ));
+TEST_CASE("guid", "basic tests") {
+	auto nullGuid = Guid::Null();
+	REQUIRE(nullGuid == Guid(0, 0, 0, 0));
 
 	auto charGuid = Guid("{70C74876-2ABC-4B9A-A2D4-A8794F055A35}");
 	REQUIRE(charGuid.Data1() == 0x70c74876);
@@ -26,11 +25,11 @@ TEST_CASE("guid", "basic tests")
 	REQUIRE(stringGuid == charGuid);
 
 	std::set<Guid> guidsSet = {nullGuid, charGuid};
-	auto foundSet = guidsSet.find(charGuid) != end(guidsSet);
+	auto foundSet           = guidsSet.find(charGuid) != end(guidsSet);
 	REQUIRE(foundSet == true);
 
-	std::unordered_set<Guid> guidsUnorderedSet = { nullGuid, charGuid };
-	auto foundUSet = guidsUnorderedSet.find(charGuid) != end(guidsUnorderedSet);
+	std::unordered_set<Guid> guidsUnorderedSet = {nullGuid, charGuid};
+	auto foundUSet                             = guidsUnorderedSet.find(charGuid) != end(guidsUnorderedSet);
 	REQUIRE(foundUSet == true);
 
 	std::stringstream stream;

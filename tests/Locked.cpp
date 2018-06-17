@@ -1,59 +1,47 @@
 #include "catch.hpp"
 #include "core/Locked.h"
-#include <future>
-#include <algorithm>
-#include <numeric>
-#include <vector>
-#include <list>
-#include <set>
 #include "core/algorithm.h"
+#include <algorithm>
+#include <future>
+#include <list>
+#include <numeric>
+#include <set>
+#include <vector>
 
 using namespace std;
 using namespace CR::Core;
 
-TEST_CASE("Locked", "basic tests")
-{
+TEST_CASE("Locked", "basic tests") {
 	Locked<vector<int>> data;
-	
-	auto task1 = async(std::launch::async, [&](){
-		for (int i = 0; i < 10000; ++i)
-		{
-			data([i](auto& a_data) {
-				a_data.push_back(i);
-			});
+
+	auto task1 = async(std::launch::async, [&]() {
+		for(int i = 0; i < 10000; ++i) {
+			data([i](auto& a_data) { a_data.push_back(i); });
 		}
 	});
-	auto task2 = async(std::launch::async, [&](){
-		for (int i = 0; i < 10000; ++i)
-		{
-			data([i](auto& a_data) {
-				a_data.push_back(i);
-			});
+	auto task2 = async(std::launch::async, [&]() {
+		for(int i = 0; i < 10000; ++i) {
+			data([i](auto& a_data) { a_data.push_back(i); });
 		}
 	});
-	//should crash or undefined behavior if Locked doesn't work
+	// should crash or undefined behavior if Locked doesn't work
 	task1.wait();
 	task2.wait();
 
 	const auto& cdata = data;
 
-	auto task3 = async(std::launch::async, [&](){
-		return cdata([](const auto& a_data) {
-			return accumulate(a_data, 0);
-		});
-	});
+	auto task3 =
+	    async(std::launch::async, [&]() { return cdata([](const auto& a_data) { return accumulate(a_data, 0); }); });
 	int result1 = task3.get();
 
 	REQUIRE(result1 == 99990000);
 }
 
-TEST_CASE("Locked Multiple", "multiple types")
-{
+TEST_CASE("Locked Multiple", "multiple types") {
 	Locked<vector<int>, list<float>> data;
 
 	auto task1 = async(std::launch::async, [&]() {
-		for(int i = 0; i < 5; ++i)
-		{
+		for(int i = 0; i < 5; ++i) {
 			data([i](auto& a_intVec, auto& a_floatList) {
 				a_intVec.push_back(i);
 				a_floatList.push_back(2.0f * i);
@@ -61,8 +49,7 @@ TEST_CASE("Locked Multiple", "multiple types")
 		}
 	});
 	auto task2 = async(std::launch::async, [&]() {
-		for(int i = 5; i < 10; ++i)
-		{
+		for(int i = 5; i < 10; ++i) {
 			data([i](auto& a_intVec, auto& a_floatList) {
 				a_intVec.push_back(i);
 				a_floatList.push_back(2.0f * i);
@@ -74,54 +61,48 @@ TEST_CASE("Locked Multiple", "multiple types")
 
 	const auto& cdata = data;
 
-	auto task3 = async(std::launch::async, [&]() {
-		return cdata([](const auto& a_intVec, const auto& a_floatList) {
-			return make_tuple(accumulate(a_intVec, 0), accumulate(a_floatList, 0));
-		});
-	});
+	auto task3   = async(std::launch::async, [&]() {
+        return cdata([](const auto& a_intVec, const auto& a_floatList) {
+            return make_tuple(accumulate(a_intVec, 0), accumulate(a_floatList, 0));
+        });
+    });
 	auto result1 = task3.get();
 
 	REQUIRE(get<0>(result1) == 45);
 	REQUIRE(get<1>(result1) == 90);
 }
 
-class SemiregularType
-{
-public:
-	SemiregularType() = default;
-	~SemiregularType() = default;
+class SemiregularType {
+  public:
+	SemiregularType()                       = default;
+	~SemiregularType()                      = default;
 	SemiregularType(const SemiregularType&) = default;
 	SemiregularType& operator=(const SemiregularType&) = default;
 
-private:
+  private:
 	int m_data{0};
 };
 
-TEST_CASE("Locked Container", "Locked should be totatly ordered if contained types are totaly ordered")
-{
-	//This code should not compile. if Locked is holding a semi regular type, then locked should also 
-	//be semi regular and not work with a set.
-	//set<Locked<SemiregularType>> setOfLocksSemiregular;
-	//setOfLocksSemiregular.insert(Locked<SemiregularType>{});
+TEST_CASE("Locked Container", "Locked should be totatly ordered if contained types are totaly ordered") {
+	// This code should not compile. if Locked is holding a semi regular type, then locked should also
+	// be semi regular and not work with a set.
+	// set<Locked<SemiregularType>> setOfLocksSemiregular;
+	// setOfLocksSemiregular.insert(Locked<SemiregularType>{});
 
-	//test locked can work with a TotalyOrdered type
+	// test locked can work with a TotalyOrdered type
 	set<Locked<int>> setOfLocks;
 	setOfLocks.insert(Locked<int>{2});
 	setOfLocks.insert(Locked<int>{10});
 	setOfLocks.insert(Locked<int>{15});
 
 	int sum = 0;
-	for(const auto& item : setOfLocks)
-	{
-		item([&](const auto& arg) {
-			sum += arg;
-		});
+	for(const auto& item : setOfLocks) {
+		item([&](const auto& arg) { sum += arg; });
 	}
 	REQUIRE(sum == 27);
 }
 
-TEST_CASE("lock multiple Lockeds", "")
-{
+TEST_CASE("lock multiple Lockeds", "") {
 	Locked<int> data1;
 	Locked<vector<int>> data2;
 
@@ -133,24 +114,17 @@ TEST_CASE("lock multiple Lockeds", "")
 	});
 }
 
-TEST_CASE("Locked try", "")
-{
+TEST_CASE("Locked try", "") {
 	Locked<vector<int>> data;
 
 	auto task1 = async(std::launch::async, [&]() {
-		for(int i = 0; i < 10000; ++i)
-		{
-			data.Try([i](auto& a_data) {
-				a_data.push_back(i);
-			});
+		for(int i = 0; i < 10000; ++i) {
+			data.Try([i](auto& a_data) { a_data.push_back(i); });
 		}
 	});
 	auto task2 = async(std::launch::async, [&]() {
-		for(int i = 0; i < 10000; ++i)
-		{
-			data.Try([i](auto& a_data) {
-				a_data.push_back(i);
-			});
+		for(int i = 0; i < 10000; ++i) {
+			data.Try([i](auto& a_data) { a_data.push_back(i); });
 		}
 	});
 	task1.wait();
@@ -158,35 +132,27 @@ TEST_CASE("Locked try", "")
 
 	const auto& cdata = data;
 
-	auto task3 = async(std::launch::async, [&]() {
-		return cdata([](const auto& a_data) {
-			return accumulate(a_data, 0);
-		});
-	});
+	auto task3 =
+	    async(std::launch::async, [&]() { return cdata([](const auto& a_data) { return accumulate(a_data, 0); }); });
 	int result1 = task3.get();
 
-	//Surely some of the try locks should have failed in this case, skipping some of the adds.
+	// Surely some of the try locks should have failed in this case, skipping some of the adds.
 	REQUIRE(result1 != 99990000);
 }
 
-TEST_CASE("Locked try wait", "loops on try to make sure no iteration is missed")
-{
+TEST_CASE("Locked try wait", "loops on try to make sure no iteration is missed") {
 	Locked<vector<int>> data;
 
 	auto task1 = async(std::launch::async, [&]() {
-		for(int i = 0; i < 10000; ++i)
-		{
-			while(!data.Try([i](auto& a_data) {
-				a_data.push_back(i);
-			}));
+		for(int i = 0; i < 10000; ++i) {
+			while(!data.Try([i](auto& a_data) { a_data.push_back(i); }))
+				;
 		}
 	});
 	auto task2 = async(std::launch::async, [&]() {
-		for(int i = 0; i < 10000; ++i)
-		{
-			while(!data.Try([i](auto& a_data) {
-				a_data.push_back(i);
-			}));
+		for(int i = 0; i < 10000; ++i) {
+			while(!data.Try([i](auto& a_data) { a_data.push_back(i); }))
+				;
 		}
 	});
 	task1.wait();
@@ -194,11 +160,8 @@ TEST_CASE("Locked try wait", "loops on try to make sure no iteration is missed")
 
 	const auto& cdata = data;
 
-	auto task3 = async(std::launch::async, [&]() {
-		return cdata([](const auto& a_data) {
-			return accumulate(a_data, 0);
-		});
-	});
+	auto task3 =
+	    async(std::launch::async, [&]() { return cdata([](const auto& a_data) { return accumulate(a_data, 0); }); });
 	int result1 = task3.get();
 
 	REQUIRE(result1 == 99990000);
