@@ -14,4 +14,5 @@ option(IncludeTests "Include Unit Tests" ON)
 
 
 include (${CMAKE_CURRENT_SOURCE_DIR}/build.cmake)
-include_directories("${PROJECT_SOURCE_DIR}/../../3rdParty/catch")
+include (${CMAKE_CURRENT_SOURCE_DIR}/../../3rdParty/build/build_catch.cmake)
+include (${CMAKE_CURRENT_SOURCE_DIR}/../../3rdParty/build/build_fmt.cmake)

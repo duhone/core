@@ -1,6 +1,6 @@
 #include "catch.hpp"
 #include "core/Reflection.h"
-#include <iostream>
+#include "fmt/format.h"
 
 ReflectMember(X);
 ReflectMember(Y);
@@ -29,10 +29,10 @@ class Vector3 {
 template<typename T>
 bool PrintDotIfAvailable([[maybe_unused]] const T& arg1, [[maybe_unused]] const T& arg2) {
 	if constexpr(HasFuncionDot_v<T, T>) {
-		cout << arg1.Dot(arg2) << endl;
+    fmt::print("Dot: {}\n", arg1.Dot(arg2));
 		return true;
 	} else {
-		cout << "No dot function available" << endl;
+    fmt::print("No dot function available\n");
 		return false;
 	}
 }

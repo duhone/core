@@ -53,7 +53,7 @@ set(CORE_TEST_SRCS
     ${CMAKE_CURRENT_LIST_DIR}/../tests/Reflection.cpp
 )
 	
-	add_executable(core_tests $<TARGET_OBJECTS:core> ${CORE_TEST_SRCS})
+	add_executable(core_tests $<TARGET_OBJECTS:core> $<TARGET_OBJECTS:fmt> ${CORE_TEST_SRCS})
 						
 	source_group("Source" FILES ${CORE_TEST_SRCS})
 
