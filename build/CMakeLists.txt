@@ -1,10 +1,8 @@
-cmake_minimum_required (VERSION 2.6)
+cmake_minimum_required (VERSION 3.12)
+set(CMAKE_CONFIGURATION_TYPES "Debug;ReleaseD;Profile;Final") 
+include (${CMAKE_CURRENT_SOURCE_DIR}/common.cmake)
 
 project (core)
-
-set_property(GLOBAL PROPERTY USE_FOLDERS ON)
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP /WX /W4 /std:c++latest /fp:fast /fp:except-")
-SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /arch:AVX /Oi /Ot /sdl-")
 
 ###############################################
 #options
@@ -16,3 +14,4 @@ option(IncludeTests "Include Unit Tests" ON)
 include (${CMAKE_CURRENT_SOURCE_DIR}/build.cmake)
 include (${CMAKE_CURRENT_SOURCE_DIR}/../../3rdParty/build/build_catch.cmake)
 include (${CMAKE_CURRENT_SOURCE_DIR}/../../3rdParty/build/build_fmt.cmake)
+include (${CMAKE_CURRENT_SOURCE_DIR}/../../3rdParty/build/build_spdlog.cmake)
