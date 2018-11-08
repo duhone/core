@@ -18,14 +18,17 @@ set(CORE_PUBLIC_HDRS
     ${CMAKE_CURRENT_LIST_DIR}/../inc/core/Timer.h
     ${CMAKE_CURRENT_LIST_DIR}/../inc/core/TypeTraits.h
     ${CMAKE_CURRENT_LIST_DIR}/../inc/core/Reflection.h
+    ${CMAKE_CURRENT_LIST_DIR}/../inc/core/Log.h
 )
 
 set(CORE_SRCS
     ${CMAKE_CURRENT_LIST_DIR}/../src/StringUtil.cpp
     ${CMAKE_CURRENT_LIST_DIR}/../src/Timer.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/../src/Log.cpp
 )
 
 set(CORE_BUILD
+    ${CMAKE_CURRENT_LIST_DIR}/../build/common.cmake
     ${CMAKE_CURRENT_LIST_DIR}/../build/build.cmake
 )
 
@@ -51,6 +54,7 @@ set(CORE_TEST_SRCS
     ${CMAKE_CURRENT_LIST_DIR}/../tests/main.cpp
     ${CMAKE_CURRENT_LIST_DIR}/../tests/Misc.cpp
     ${CMAKE_CURRENT_LIST_DIR}/../tests/Reflection.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/../tests/Log.cpp
 )
 	
 	add_executable(core_tests $<TARGET_OBJECTS:core> $<TARGET_OBJECTS:fmt> ${CORE_TEST_SRCS})

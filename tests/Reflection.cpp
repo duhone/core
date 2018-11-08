@@ -1,6 +1,6 @@
-#include "catch.hpp"
 #include "core/Reflection.h"
-#include "fmt/format.h"
+#include "catch.hpp"
+#include "core/Log.h"
 
 ReflectMember(X);
 ReflectMember(Y);
@@ -9,6 +9,7 @@ ReflectFuncion(Dot);
 ReflectFuncion(Foo);
 
 using namespace std;
+using namespace CR::Core;
 
 class Vector2 {
   public:
@@ -29,10 +30,10 @@ class Vector3 {
 template<typename T>
 bool PrintDotIfAvailable([[maybe_unused]] const T& arg1, [[maybe_unused]] const T& arg2) {
 	if constexpr(HasFuncionDot_v<T, T>) {
-    fmt::print("Dot: {}\n", arg1.Dot(arg2));
+		Log::Info("Dot: {}\n", arg1.Dot(arg2));
 		return true;
 	} else {
-    fmt::print("No dot function available\n");
+		Log::Info("No dot function available\n");
 		return false;
 	}
 }
