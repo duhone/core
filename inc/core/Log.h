@@ -39,6 +39,11 @@ namespace CR::Core::Log {
 		detail::GetLogger().Fail(a_fmt, std::forward<ArgTs>(a_args)...);
 	}
 
+	template<typename... ArgTs>
+	void Assert(bool condition, const char* a_fmt, ArgTs&&... a_args) {
+		if(!condition) { Fail(a_fmt, std::forward<ArgTs>(a_args)...); }
+	}
+
 	namespace detail {
 		class Logger {
 		  public:
