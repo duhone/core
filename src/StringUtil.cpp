@@ -2,11 +2,11 @@
 
 bool CR::Core::CaseInsensitiveCompare(const std::wstring& s1, const std::wstring& s2) {
 	if(s1.length() != s2.length()) return false;
-	std::wstring::const_iterator iter1 = s1.begin();
-	std::wstring::const_iterator iter2 = s2.begin();
-	std::wstring::const_iterator end   = s1.end();
+	auto iter1 = s1.cbegin();
+	auto iter2 = s2.cbegin();
+	auto endIter   = s1.cend();
 
-	while(iter1 != end) {
+	while(iter1 != endIter) {
 		wchar_t c1 = *iter1;
 		wchar_t c2 = *iter2;
 		if(c1 >= 'A' && c1 <= 'Z') c1 += 'a' - 'A';

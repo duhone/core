@@ -1,5 +1,5 @@
 #include "core/Timer.h"
-#include <cstdio>
+#include "fmt/format.h"
 
 using namespace std;
 using namespace CR::Core;
@@ -34,5 +34,5 @@ ScopedTimer::ScopedTimer(const char* text) : m_text(text) {}
 
 ScopedTimer::~ScopedTimer() {
 	m_timer.Update();
-	printf("%s %0.2fms\n", m_text.c_str(), (m_timer.GetTotalTime() * 1000));
+	fmt::print("{} {0.2f}ms\n", m_text, (m_timer.GetTotalTime() * 1000));
 }

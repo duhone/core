@@ -2,7 +2,7 @@
 #include <functional>
 #include <vector>
 
-namespace std17 {
+namespace std23 {
 	template<typename EF>
 	struct scope_exit {
 		// construction
@@ -94,4 +94,4 @@ namespace std17 {
 		bool shouldrun = not bool(r == invalid);
 		return unique_resource<R, D>(std::move(r), std::move(d), shouldrun);
 	}
-}    // namespace std17
+}    // namespace std23
