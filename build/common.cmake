@@ -1,8 +1,6 @@
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set(CMAKE_CXX_STANDARD 17)
 
-add_compile_options(/W4)
-add_compile_options(/WX)
 add_compile_options($<$<CXX_COMPILER_ID:MSVC>:/arch:AVX>)
 add_compile_options($<$<CXX_COMPILER_ID:MSVC>:/fp:fast>)
 add_compile_options($<$<CXX_COMPILER_ID:MSVC>:/fp:except->)
