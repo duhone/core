@@ -34,5 +34,5 @@ ScopedTimer::ScopedTimer(const char* text) : m_text(text) {}
 
 ScopedTimer::~ScopedTimer() {
 	m_timer.Update();
-	fmt::print("{} {0.2f}ms\n", m_text, (m_timer.GetTotalTime() * 1000));
+	fmt::print("{} {:.2f}ms\n", m_text, (m_timer.GetTotalTime() * 1000));
 }
