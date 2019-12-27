@@ -2,9 +2,9 @@
 
 bool CR::Core::CaseInsensitiveCompare(const std::wstring& s1, const std::wstring& s2) {
 	if(s1.length() != s2.length()) return false;
-	auto iter1 = s1.cbegin();
-	auto iter2 = s2.cbegin();
-	auto endIter   = s1.cend();
+	auto iter1   = s1.cbegin();
+	auto iter2   = s2.cbegin();
+	auto endIter = s1.cend();
 
 	while(iter1 != endIter) {
 		wchar_t c1 = *iter1;

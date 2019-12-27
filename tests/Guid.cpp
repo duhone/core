@@ -1,5 +1,5 @@
-#include "catch.hpp"
 #include "core/Guid.h"
+#include "catch.hpp"
 #include <set>
 #include <sstream>
 #include <unordered_set>

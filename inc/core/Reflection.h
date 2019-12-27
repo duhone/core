@@ -23,4 +23,4 @@ namespace {
 	using HasFuncion##funcName##_t = typename HasFuncion##funcName<T, void, Args...>::type;                            \
 	template<typename T, typename... Args>                                                                             \
 	constexpr bool HasFuncion##funcName##_v = HasFuncion##funcName##_t<T, Args...>::value;
-}
+}    // namespace
