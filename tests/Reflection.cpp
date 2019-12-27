@@ -1,6 +1,7 @@
-#include "core/Reflection.h"
 #include "catch.hpp"
+
 #include "core/Log.h"
+#include "core/Reflection.h"
 
 ReflectMember(X);
 ReflectMember(Y);

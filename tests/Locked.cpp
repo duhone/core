@@ -1,5 +1,6 @@
-#include "core/Locked.h"
 #include "catch.hpp"
+
+#include "core/Locked.h"
 #include "core/algorithm.h"
 #include <algorithm>
 #include <future>
