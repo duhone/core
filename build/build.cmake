@@ -43,7 +43,7 @@ source_group("Source" FILES ${CORE_SRCS})
 source_group("Build" FILES ${CORE_BUILD})
 		
 target_include_directories(core PUBLIC "${core_root}/inc")
-target_link_libraries(core 
+target_link_libraries(core PUBLIC
   spdlog
   fmt
 )
