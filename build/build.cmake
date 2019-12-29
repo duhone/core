@@ -13,6 +13,7 @@ set(CORE_PUBLIC_HDRS
     ${core_root}/inc/core/literals.h
     ${core_root}/inc/core/Locked.h
     ${core_root}/inc/core/ScopeExit.h
+    ${core_root}/inc/core/Span.h
     ${core_root}/inc/core/StringUtil.h
     ${core_root}/inc/core/Timer.h
     ${core_root}/inc/core/TypeTraits.h
