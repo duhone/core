@@ -19,12 +19,14 @@ set(CORE_PUBLIC_HDRS
     ${core_root}/inc/core/TypeTraits.h
     ${core_root}/inc/core/Reflection.h
     ${core_root}/inc/core/Log.h
+    ${core_root}/inc/core/Hash.h
 )
 
 set(CORE_SRCS
     ${core_root}/src/StringUtil.cpp
     ${core_root}/src/Timer.cpp
     ${core_root}/src/Log.cpp
+    ${core_root}/src/Hash.cpp
 )
 
 set(CORE_BUILD
