@@ -4,6 +4,7 @@ set(CMAKE_CXX_STANDARD 17)
 add_compile_options($<$<CXX_COMPILER_ID:MSVC>:/arch:AVX>)
 add_compile_options($<$<CXX_COMPILER_ID:MSVC>:/fp:fast>)
 add_compile_options($<$<CXX_COMPILER_ID:MSVC>:/fp:except->)
+add_compile_options($<$<CXX_COMPILER_ID:MSVC>:/MP>)
 add_compile_options($<$<CXX_COMPILER_ID:Clang>:-ffast-math>)
 add_compile_options($<$<CXX_COMPILER_ID:GNU>:-ffast-math>)
 
