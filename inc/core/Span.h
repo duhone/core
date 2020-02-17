@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "core/Log.h"
 
 #include <type_traits>
@@ -9,6 +9,8 @@ namespace CR::Core {
 	class Span {
 	  public:
 		Span() = default;
+		template<size_t N>
+		Span(T (&a_data)[N]) : m_data(a_data), m_size(N) {}
 		Span(T* a_data, size_t a_size) : m_data(a_data), m_size(a_size) {}
 		~Span() = default;
 		Span(const Span<std::remove_const_t<T>>& a_other) : m_data(a_other.data()), m_size(a_other.size()) {}
