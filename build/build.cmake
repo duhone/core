@@ -5,9 +5,11 @@ set(core_root "${CMAKE_CURRENT_LIST_DIR}/..")
 ###############################################
 set(CORE_PUBLIC_HDRS
     ${core_root}/inc/core/algorithm.h
+    ${core_root}/inc/core/BinaryStream.h
     ${core_root}/inc/core/ClassFactory.h
     ${core_root}/inc/core/Concepts.h
     ${core_root}/inc/core/DefaultOperators.h
+    ${core_root}/inc/core/FileHandle.h
     ${core_root}/inc/core/Function.h
     ${core_root}/inc/core/Guid.h
     ${core_root}/inc/core/literals.h
