@@ -41,7 +41,7 @@ namespace CR::Core {
 
 	// Reading should always come from a memory mapped file, so less help is needed.
 	struct BinaryReader {
-		std::byte* Data;
+		const std::byte* Data;
 		uint32_t Offset{0};
 	};
 
