@@ -10,7 +10,7 @@ project (core)
 option(IncludeTests "Include Unit Tests" ON)
 
 include (${CMAKE_CURRENT_SOURCE_DIR}/common.cmake)
-include (${CMAKE_CURRENT_SOURCE_DIR}/../../3rdParty/build/build_catch.cmake)
+include (${CMAKE_CURRENT_SOURCE_DIR}/../../3rdParty/build/build_doctest.cmake)
 include (${CMAKE_CURRENT_SOURCE_DIR}/../../3rdParty/build/build_fmt.cmake)
 include (${CMAKE_CURRENT_SOURCE_DIR}/../../3rdParty/build/build_spdlog.cmake)
 include (${CMAKE_CURRENT_SOURCE_DIR}/max_warnings.cmake)
