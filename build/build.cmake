@@ -25,10 +25,15 @@ set(PUBLIC_HDRS
 )
 
 set(SRCS
+	${root}/src/Function.cpp
+	${root}/src/Guid.cpp
+    ${root}/src/Hash.cpp
+	${root}/src/Locked.cpp
+    ${root}/src/Log.cpp
+	${root}/src/Misc.cpp
+	${root}/src/Reflection.cpp
     ${root}/src/StringUtil.cpp
     ${root}/src/Timer.cpp
-    ${root}/src/Log.cpp
-    ${root}/src/Hash.cpp
 )
 
 set(BUILD
@@ -45,6 +50,7 @@ settingsCR(core)
 		
 target_include_directories(core PUBLIC "${root}/inc")
 target_link_libraries(core PUBLIC
+  doctest
   spdlog
   fmt
 )
@@ -58,13 +64,7 @@ set(SRCS
 	${root}/tests/ClassFactoryTest2.cpp
 	${root}/tests/ClassFactoryTestInterface.h
 	${root}/tests/ClassFactoryTestInterface.cpp
-	${root}/tests/Function.cpp
-	${root}/tests/Guid.cpp
-	${root}/tests/Locked.cpp
 	${root}/tests/main.cpp
-	${root}/tests/Misc.cpp
-	${root}/tests/Reflection.cpp
-	${root}/tests/Log.cpp
 )
 
 add_executable(core_tests 
@@ -74,7 +74,7 @@ add_executable(core_tests
 settingsCR(core_tests)
 	
 target_link_libraries(core_tests 
-	catch
+	doctest
 	spdlog
 	fmt
 	core

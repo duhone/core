@@ -1,13 +1,14 @@
-#include "catch.hpp"
+﻿#include "core/Guid.h"
 
-#include "core/Guid.h"
+#include <3rdParty/doctest.h>
+
 #include <set>
 #include <sstream>
 #include <unordered_set>
 
 using namespace CR::Core;
 
-TEST_CASE("guid", "basic tests") {
+TEST_CASE("guid") {
 	auto nullGuid = Guid::Null();
 	REQUIRE(nullGuid == Guid(0, 0, 0, 0));
 

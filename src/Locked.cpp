@@ -1,7 +1,9 @@
-#include "catch.hpp"
+﻿#include "core/Locked.h"
 
-#include "core/Locked.h"
 #include "core/algorithm.h"
+
+#include <3rdParty/doctest.h>
+
 #include <algorithm>
 #include <future>
 #include <list>
@@ -12,7 +14,7 @@
 using namespace std;
 using namespace CR::Core;
 
-TEST_CASE("Locked", "basic tests") {
+TEST_CASE("Locked") {
 	Locked<vector<int>> data;
 
 	auto task1 = async(std::launch::async, [&]() {
@@ -38,7 +40,7 @@ TEST_CASE("Locked", "basic tests") {
 	REQUIRE(result1 == 99990000);
 }
 
-TEST_CASE("Locked Multiple", "multiple types") {
+TEST_CASE("Locked Multiple") {
 	Locked<vector<int>, list<float>> data;
 
 	auto task1 = async(std::launch::async, [&]() {
@@ -84,7 +86,7 @@ class SemiregularType {
 	int m_data{0};
 };
 
-TEST_CASE("Locked Container", "Locked should be totatly ordered if contained types are totaly ordered") {
+TEST_CASE("Locked Container") {
 	// This code should not compile. if Locked is holding a semi regular type, then locked should also
 	// be semi regular and not work with a set.
 	// set<Locked<SemiregularType>> setOfLocksSemiregular;
@@ -103,7 +105,7 @@ TEST_CASE("Locked Container", "Locked should be totatly ordered if contained typ
 	REQUIRE(sum == 27);
 }
 
-TEST_CASE("lock multiple Lockeds", "") {
+TEST_CASE("lock multiple Lockeds") {
 	Locked<int> data1;
 	Locked<vector<int>> data2;
 
@@ -115,7 +117,7 @@ TEST_CASE("lock multiple Lockeds", "") {
 	});
 }
 
-TEST_CASE("Locked try", "") {
+TEST_CASE("Locked try") {
 	Locked<vector<int>> data;
 
 	auto task1 = async(std::launch::async, [&]() {
@@ -141,7 +143,7 @@ TEST_CASE("Locked try", "") {
 	REQUIRE(result1 != 99990000);
 }
 
-TEST_CASE("Locked try wait", "loops on try to make sure no iteration is missed") {
+TEST_CASE("Locked try wait") {
 	Locked<vector<int>> data;
 
 	auto task1 = async(std::launch::async, [&]() {

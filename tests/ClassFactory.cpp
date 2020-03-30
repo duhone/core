@@ -1,7 +1,8 @@
-#include "ClassFactoryTestInterface.h"
-#include "catch.hpp"
+﻿#include "ClassFactoryTestInterface.h"
 
-TEST_CASE("class_factory", "basic tests") {
+#include <3rdParty/doctest.h>
+
+TEST_CASE("class_factory") {
 	auto class1 = CreateInstance(TestClasses::Class1, 356);
 	REQUIRE(class1.get());
 	REQUIRE(class1->GetType() == TestClasses::Class1);

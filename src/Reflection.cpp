@@ -1,7 +1,8 @@
-#include "catch.hpp"
+#include "core/Reflection.h"
 
 #include "core/Log.h"
-#include "core/Reflection.h"
+
+#include <3rdParty/doctest.h>
 
 ReflectMember(X);
 ReflectMember(Y);
@@ -39,7 +40,7 @@ bool PrintDotIfAvailable([[maybe_unused]] const T& arg1, [[maybe_unused]] const 
 	}
 }
 
-TEST_CASE("Reflection", "") {
+TEST_CASE("Reflection") {
 	REQUIRE(HasMemberX_v<Vector2>);
 	REQUIRE(HasMemberY_v<Vector2>);
 	REQUIRE(!HasMemberZ_v<Vector2>);

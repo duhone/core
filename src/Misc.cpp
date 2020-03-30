@@ -1,12 +1,13 @@
-#include "catch.hpp"
-
 #include "core/algorithm.h"
+
+#include <3rdParty/doctest.h>
+
 #include <vector>
 
 using namespace std;
 using namespace CR::Core;
 
-TEST_CASE("for_each_argument", "") {
+TEST_CASE("for_each_argument") {
 	vector<int> squares;
 	auto square = [&](auto value) { squares.emplace_back(value * value); };
 

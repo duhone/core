@@ -1,8 +1,8 @@
-#include "catch.hpp"
+﻿#include "core/Function.h"
 
-#include "core/Function.h"
+#include <3rdParty/doctest.h>
 
-TEST_CASE("function", "basic tests") {
+TEST_CASE("function") {
 	CR::Core::MultiFunction<void(int, int)> multiFunc;
 	int test1 = 0;
 	int test2 = 0;

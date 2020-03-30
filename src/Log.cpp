@@ -1,4 +1,6 @@
-#include "core/Log.h"
+﻿#include "core/Log.h"
+
+#include <3rdParty/doctest.h>
 
 using namespace CR::Core::Log;
 using namespace std;
@@ -33,4 +35,18 @@ void detail::Logger::Free() {
 CR::Core::Log::detail::Logger& CR::Core::Log::detail::GetLogger() {
 	static CR::Core::Log::detail::Logger logger;
 	return logger;
+}
+
+TEST_CASE("Log") {
+	Info("Testing info");
+	Warn("Testing warn");
+
+	// Leave commented out, will crash(on purpose) in debug and release builds
+	// Error("Testing Error");
+
+	// Leave commented out, will crash(on purpose) in all builds
+	// Fail("Testing Fail");
+
+	// catch logging interferes with spdlog, so give a little bit of time for spdlog to finish
+	this_thread::sleep_for(250ms);
 }
