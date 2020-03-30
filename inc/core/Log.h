@@ -1,7 +1,7 @@
 #pragma once
-#define SPDLOG_FMT_EXTERNAL
-#include "spdlog/async.h"
-#include "spdlog/spdlog.h"
+
+#include "3rdParty/spdlog.h"
+
 #include <cassert>
 #include <memory>
 #include <thread>

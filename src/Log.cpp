@@ -1,9 +1,4 @@
 #include "core/Log.h"
-#include "spdlog/async_logger.h"
-#include "spdlog/logger.h"
-#include "spdlog/sinks/dist_sink.h"
-#include "spdlog/sinks/msvc_sink.h"
-#include "spdlog/sinks/stdout_color_sinks.h"
 
 using namespace CR::Core::Log;
 using namespace std;

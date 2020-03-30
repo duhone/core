@@ -1,88 +1,83 @@
-set(core_root "${CMAKE_CURRENT_LIST_DIR}/..")
+set(root "${CMAKE_CURRENT_LIST_DIR}/..")
 
 ###############################################
 #library
 ###############################################
-set(CORE_PUBLIC_HDRS
-    ${core_root}/inc/core/algorithm.h
-    ${core_root}/inc/core/BinaryStream.h
-    ${core_root}/inc/core/ClassFactory.h
-    ${core_root}/inc/core/Concepts.h
-    ${core_root}/inc/core/DefaultOperators.h
-    ${core_root}/inc/core/FileHandle.h
-    ${core_root}/inc/core/Function.h
-    ${core_root}/inc/core/Guid.h
-    ${core_root}/inc/core/literals.h
-    ${core_root}/inc/core/Locked.h
-    ${core_root}/inc/core/ScopeExit.h
-    ${core_root}/inc/core/Span.h
-    ${core_root}/inc/core/StringUtil.h
-    ${core_root}/inc/core/Timer.h
-    ${core_root}/inc/core/TypeTraits.h
-    ${core_root}/inc/core/Reflection.h
-    ${core_root}/inc/core/Log.h
-    ${core_root}/inc/core/Hash.h
+set(PUBLIC_HDRS
+    ${root}/inc/core/algorithm.h
+    ${root}/inc/core/BinaryStream.h
+    ${root}/inc/core/ClassFactory.h
+    ${root}/inc/core/Concepts.h
+    ${root}/inc/core/DefaultOperators.h
+    ${root}/inc/core/FileHandle.h
+    ${root}/inc/core/Function.h
+    ${root}/inc/core/Guid.h
+    ${root}/inc/core/literals.h
+    ${root}/inc/core/Locked.h
+    ${root}/inc/core/ScopeExit.h
+    ${root}/inc/core/Span.h
+    ${root}/inc/core/StringUtil.h
+    ${root}/inc/core/Timer.h
+    ${root}/inc/core/TypeTraits.h
+    ${root}/inc/core/Reflection.h
+    ${root}/inc/core/Log.h
+    ${root}/inc/core/Hash.h
 )
 
-set(CORE_SRCS
-    ${core_root}/src/StringUtil.cpp
-    ${core_root}/src/Timer.cpp
-    ${core_root}/src/Log.cpp
-    ${core_root}/src/Hash.cpp
+set(SRCS
+    ${root}/src/StringUtil.cpp
+    ${root}/src/Timer.cpp
+    ${root}/src/Log.cpp
+    ${root}/src/Hash.cpp
 )
 
-set(CORE_BUILD
-    ${core_root}/build/common.cmake
-    ${core_root}/build/max_warnings.cmake
-    ${core_root}/build/build.cmake
+set(BUILD
+    ${root}/build/build.cmake
 )
 
 add_library(core OBJECT 
-  ${CORE_PUBLIC_HDRS} 
-  ${CORE_SRCS} 
-  ${CORE_BUILD}
+  ${PUBLIC_HDRS} 
+  ${SRCS} 
+  ${BUILD}
 )
-	
-source_group("Public Headers" FILES ${CORE_PUBLIC_HDRS})
-source_group("Source" FILES ${CORE_SRCS})
-source_group("Build" FILES ${CORE_BUILD})
+
+settingsCR(core)	
 		
-target_include_directories(core PUBLIC "${core_root}/inc")
+target_include_directories(core PUBLIC "${root}/inc")
 target_link_libraries(core PUBLIC
   spdlog
   fmt
 )
 
-if(IncludeTests)  
-	###############################################
-	#unit tests
-	###############################################
-  set(CORE_TEST_SRCS
-    ${core_root}/tests/ClassFactory.cpp
-    ${core_root}/tests/ClassFactoryTest1.cpp
-    ${core_root}/tests/ClassFactoryTest2.cpp
-    ${core_root}/tests/ClassFactoryTestInterface.h
-    ${core_root}/tests/ClassFactoryTestInterface.cpp
-    ${core_root}/tests/Function.cpp
-    ${core_root}/tests/Guid.cpp
-    ${core_root}/tests/Locked.cpp
-    ${core_root}/tests/main.cpp
-    ${core_root}/tests/Misc.cpp
-    ${core_root}/tests/Reflection.cpp
-    ${core_root}/tests/Log.cpp
-  )
-	
-  add_executable(core_tests 
-    ${CORE_TEST_SRCS}
-  )
-				
-  target_link_libraries(core_tests 
-    catch
-    spdlog
-    fmt
-    core
-  )		
-	source_group("Source" FILES ${CORE_TEST_SRCS})
+###############################################
+#unit tests
+###############################################
+set(SRCS
+	${root}/tests/ClassFactory.cpp
+	${root}/tests/ClassFactoryTest1.cpp
+	${root}/tests/ClassFactoryTest2.cpp
+	${root}/tests/ClassFactoryTestInterface.h
+	${root}/tests/ClassFactoryTestInterface.cpp
+	${root}/tests/Function.cpp
+	${root}/tests/Guid.cpp
+	${root}/tests/Locked.cpp
+	${root}/tests/main.cpp
+	${root}/tests/Misc.cpp
+	${root}/tests/Reflection.cpp
+	${root}/tests/Log.cpp
+)
 
-	set_property(TARGET core_tests APPEND PROPERTY FOLDER tests)
-endif()
+add_executable(core_tests 
+	${SRCS}
+)
+		
+settingsCR(core_tests)
+	
+target_link_libraries(core_tests 
+	catch
+	spdlog
+	fmt
+	core
+)		
+
+set_property(TARGET core_tests APPEND PROPERTY FOLDER tests)
