@@ -1,6 +1,8 @@
-#pragma once
+﻿#pragma once
 
 #include "FileHandle.h"
+
+#include "core/Log.h"
 
 #include <cstddef>
 #include <type_traits>
@@ -41,13 +43,21 @@ namespace CR::Core {
 
 	// Reading should always come from a memory mapped file, so less help is needed.
 	struct BinaryReader {
-		const std::byte* Data;
+		BinaryReader() = default;
+		// input stream must outlive the reader
+		BinaryReader(const std::vector<std::byte>& a_stream) : Data(a_stream.data()), Size((uint32_t)a_stream.size()) {}
+
+		const std::byte* Data{nullptr};
 		uint32_t Offset{0};
+		uint32_t Size{0};
 	};
 
 	template<typename T>
 	void Read(BinaryReader& a_stream, T& a_out) {
 		static_assert(std::is_standard_layout_v<T>, "template writer for binary streams only supports pod types");
+		if(a_stream.Offset + sizeof(T) > a_stream.Size) {
+			CR::Core::Log::Fail("Tried to read past the end of the buffer");
+		}
 		memcpy(&a_out, a_stream.Data + a_stream.Offset, sizeof(T));
 		a_stream.Offset += sizeof(T);
 	}
@@ -56,6 +66,11 @@ namespace CR::Core {
 	void Read(BinaryReader& a_stream, std::vector<T>& a_out) {
 		uint32_t outSize = 0;
 		Read(a_stream, outSize);
+
+		if(a_stream.Offset + outSize * sizeof(T) > a_stream.Size) {
+			CR::Core::Log::Fail("Tried to read past the end of the buffer");
+		}
+
 		a_out.resize(outSize);
 		memcpy(a_out.data(), a_stream.Data + a_stream.Offset, outSize * sizeof(T));
 		a_stream.Offset += outSize * sizeof(T);

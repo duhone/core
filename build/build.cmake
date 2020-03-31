@@ -25,6 +25,7 @@ set(PUBLIC_HDRS
 )
 
 set(SRCS
+	${root}/src/BinaryStream.cpp
 	${root}/src/Function.cpp
 	${root}/src/Guid.cpp
     ${root}/src/Hash.cpp
