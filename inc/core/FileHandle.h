@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <cstdio>
 #include <filesystem>
@@ -12,10 +12,10 @@ namespace CR::Core {
 
 		FileHandle(const FileHandle&) = delete;
 		FileHandle& operator=(const FileHandle&) = delete;
-		FileHandle(FileHandle&& a_other);
-		FileHandle& operator=(FileHandle&& a_other);
+		FileHandle(FileHandle&& a_other) noexcept;
+		FileHandle& operator=(FileHandle&& a_other) noexcept;
 
-		operator FILE*() const { return m_file; }
+		operator FILE*() const noexcept { return m_file; }
 
 	  private:
 		FILE* m_file{nullptr};
@@ -30,11 +30,11 @@ CR::Core::FileHandle::~FileHandle() {
 	if(m_file) { fclose(m_file); }
 }
 
-CR::Core::FileHandle::FileHandle(FileHandle&& a_other) {
+CR::Core::FileHandle::FileHandle(FileHandle&& a_other) noexcept {
 	*this = std::move(a_other);
 }
 
-CR::Core::FileHandle& CR::Core::FileHandle::operator=(FileHandle&& a_other) {
+CR::Core::FileHandle& CR::Core::FileHandle::operator=(FileHandle&& a_other) noexcept {
 	if(m_file) { fclose(m_file); }
 	m_file         = a_other.m_file;
 	a_other.m_file = nullptr;

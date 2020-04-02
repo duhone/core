@@ -42,7 +42,7 @@ namespace CR::Core {
 	}
 
 	// Reading should always come from a memory mapped file, so less help is needed.
-	struct BinaryReader {
+	struct BinaryReader final {
 		BinaryReader() = default;
 		// input stream must outlive the reader
 		BinaryReader(const std::vector<std::byte>& a_stream) : Data(a_stream.data()), Size((uint32_t)a_stream.size()) {}

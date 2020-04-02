@@ -1,4 +1,4 @@
-/*
+﻿/*
 similar to std::function
 both hold a list of functions. MultiFunction will call every assigned function when invoked.
 SelectableFunction will invoke a single one of its functions which can be independently selected.
@@ -17,13 +17,13 @@ namespace CR::Core {
 
 	// no return type for multifunction, who would win?
 	template<SemiRegular ReturnType, SemiRegular... ArgTypes>
-	class MultiFunction<ReturnType(ArgTypes...)> {
+	class MultiFunction<ReturnType(ArgTypes...)> final {
 		static_assert(std::is_same_v<ReturnType, void>, "MultiFunction only works with void return type");
 
 	  public:
 		using OperationT = std::function<ReturnType(ArgTypes...)>;
 
-		std::size_t size() const { return m_operations.size(); }
+		std::size_t size() const noexcept { return m_operations.size(); }
 
 		void operator=(std::nullptr_t) { m_operations.clear(); }
 
