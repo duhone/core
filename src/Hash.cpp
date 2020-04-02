@@ -1,4 +1,4 @@
-#include "core/Hash.h"
+﻿#include "core/Hash.h"
 
 using namespace CR;
 using namespace std;
@@ -8,11 +8,11 @@ namespace {
 }    // namespace
 
 uint32_t Core::HashFast(Span<std::byte> a_data) {
-	byte* data    = a_data.begin();
-	uint32_t hash = (uint32_t)a_data.size();
-	uint32_t left = (uint32_t)a_data.size();
+	byte* data = a_data.begin();
+	auto hash  = (uint32_t)a_data.size();
+	auto left  = (uint32_t)a_data.size();
 
-	if(left == 0) return 0;
+	if(left == 0) { return 0; }
 
 	for(; left > 3; left -= 4) {
 		uint32_t value;

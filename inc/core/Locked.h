@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "core/Concepts.h"
 #include "core/DefaultOperators.h"
 #include "core/ScopeExit.h"
@@ -84,7 +84,7 @@ namespace CR::Core {
 				if constexpr(voidFunc) {
 					return false;
 				} else {
-					return std::none;
+					return std::nullopt;
 				}
 			}
 			std::shared_lock lock(m_mutex, std::adopt_lock);
@@ -104,7 +104,7 @@ namespace CR::Core {
 				if constexpr(voidFunc) {
 					return false;
 				} else {
-					return std::none;
+					return std::nullopt;
 				}
 			}
 			std::unique_lock lock(m_mutex, std::adopt_lock);

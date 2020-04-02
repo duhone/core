@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <chrono>
 #include <string>
 
@@ -36,7 +36,7 @@ namespace CR::Core {
 		std::chrono::high_resolution_clock::time_point starttime;
 		std::chrono::high_resolution_clock::time_point currenttime;
 
-		double timerFreqInv;
+		double timerFreqInv{0.0};
 		double totalTime{0.0};
 		double timeLastFrame{0.0};
 	};

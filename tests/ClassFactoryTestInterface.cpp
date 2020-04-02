@@ -1,4 +1,4 @@
-#include "ClassFactoryTestInterface.h"
+﻿#include "ClassFactoryTestInterface.h"
 #include "core/ClassFactory.h"
 
 using namespace CR::Core;
@@ -10,7 +10,7 @@ auto& GetInstance() {
 }
 
 bool RegisterCreator(TestClasses classType, function<unique_ptr<TestInterface>(int)> creater) {
-	GetInstance().RegisterCreator(classType, creater);
+	GetInstance().RegisterCreator(classType, move(creater));
 	return true;
 }
 
