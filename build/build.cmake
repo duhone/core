@@ -53,12 +53,14 @@ target_include_directories(core PUBLIC "${root}/inc")
 target_link_libraries(core PUBLIC
   doctest
   fmt
+  function2
   spdlog
 )
 
 target_precompile_headers(core PRIVATE 
 	<3rdParty/doctest.h>
     <3rdParty/fmt.h>
+    <3rdParty/function2.h>
     <3rdParty/spdlog.h>
 )
 

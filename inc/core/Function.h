@@ -7,6 +7,9 @@ SelectableFunction will invoke a single one of its functions which can be indepe
 
 #include "core/Algorithm.h"
 #include "core/Concepts.h"
+
+#include <3rdParty/function2.h>
+
 #include <algorithm>
 #include <functional>
 #include <vector>
@@ -21,18 +24,29 @@ namespace CR::Core {
 		static_assert(std::is_same_v<ReturnType, void>, "MultiFunction only works with void return type");
 
 	  public:
-		using OperationT = std::function<ReturnType(ArgTypes...)>;
+		using OperationT = fu2::unique_function<ReturnType(ArgTypes...)>;
 
-		std::size_t size() const noexcept { return m_operations.size(); }
+		MultiFunction()                         = default;
+		~MultiFunction()                        = default;
+		MultiFunction(const MultiFunction&)     = delete;
+		MultiFunction(MultiFunction&&) noexcept = default;
+		MultiFunction& operator=(const MultiFunction&) = delete;
+		MultiFunction& operator=(MultiFunction&&) noexcept = default;
 
-		void operator=(std::nullptr_t) { m_operations.clear(); }
+		[[nodiscard]] std::size_t size() const noexcept { return m_operations.size(); }
 
-		void operator=(const OperationT& a_operation) {
-			*this = nullptr;
-			*this += a_operation;
+		MultiFunction& operator=(std::nullptr_t) {
+			m_operations.clear();
+			return *this;
 		}
 
-		void operator+=(const OperationT& a_operation) { m_operations.push_back(a_operation); }
+		MultiFunction& operator=(OperationT&& a_operation) {
+			*this = nullptr;
+			*this += std::move(a_operation);
+			return *this;
+		}
+
+		void operator+=(OperationT&& a_operation) { m_operations.push_back(std::move(a_operation)); }
 
 		template<SemiRegular... FArgTypes>
 		void operator()(FArgTypes&&... a_params) {
@@ -51,22 +65,36 @@ namespace CR::Core {
 	class SelectableFunction {};
 
 	template<SemiRegular ReturnType, SemiRegular... ArgTypes>
-	class SelectableFunction<ReturnType(ArgTypes...)> {
+	class SelectableFunction<ReturnType(ArgTypes...)> final {
 	  public:
-		using OperationT = std::function<ReturnType(ArgTypes...)>;
+		using OperationT = fu2::unique_function<ReturnType(ArgTypes...)>;
 
-		std::size_t size() const { return m_operations.size(); }
+		SelectableFunction()                              = default;
+		~SelectableFunction()                             = default;
+		SelectableFunction(const SelectableFunction&)     = delete;
+		SelectableFunction(SelectableFunction&&) noexcept = default;
+		SelectableFunction& operator=(const SelectableFunction&) = delete;
+		SelectableFunction& operator=(SelectableFunction&&) noexcept = default;
 
-		void operator=(std::nullptr_t) { m_operations.clear(); }
+		[[nodiscard]] std::size_t size() const { return m_operations.size(); }
 
-		void operator=(std::size_t a_op) { SetOperation(a_op); }
-
-		void operator=(const OperationT& a_operation) {
-			*this = nullptr;
-			*this += a_operation;
+		SelectableFunction& operator=(std::nullptr_t) {
+			m_operations.clear();
+			return *this;
 		}
 
-		void operator+=(const OperationT& a_operation) { m_operations.push_back(a_operation); }
+		SelectableFunction& operator=(std::size_t a_op) {
+			SetOperation(a_op);
+			return *this;
+		}
+
+		SelectableFunction& operator=(OperationT&& a_operation) {
+			*this = nullptr;
+			*this += std::move(a_operation);
+			return *this;
+		}
+
+		void operator+=(OperationT&& a_operation) { m_operations.push_back(std::move(a_operation)); }
 
 		template<SemiRegular... FArgTypes>
 		ReturnType operator()(FArgTypes&&... a_params) {

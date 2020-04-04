@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "core/DefaultOperators.h"
 #include "core/algorithm.h"
 #include <cassert>
@@ -6,22 +6,25 @@
 #include <string>
 
 namespace CR::Core {
-	class Guid : public DefaultOperatorsTotallyOrdered<Guid> {
+	class Guid final : public DefaultOperatorsTotallyOrdered<Guid> {
 	  public:
-		Guid(unsigned int a_data1, unsigned int a_data2, unsigned int a_data3, unsigned int a_data4) {
+		Guid(uint32_t a_data1, uint32_t a_data2, uint32_t a_data3, uint32_t a_data4) {
 			m_data[0] = a_data1;
 			m_data[1] = a_data2;
 			m_data[2] = a_data3;
 			m_data[3] = a_data4;
 		}
+		~Guid() = default;
 
-		Guid(const Guid& a_other) = default;
+		Guid(const Guid& a_other)     = default;
+		Guid(Guid&& a_other) noexcept = default;
 
 		template<typename T>
 		Guid(const T& a_data) {
 			Set(a_data);
 		}
 		Guid& operator=(const Guid& a_other) = default;
+		Guid& operator=(Guid&& a_other) noexcept = default;
 
 		Guid() : Guid(0, 0, 0, 0) {}
 
@@ -31,7 +34,9 @@ namespace CR::Core {
 			static Guid null = Guid();
 			return null;
 		}
-		bool IsNull() const { return *this == Null(); }
+
+		[[nodiscard]] bool IsNull() const { return *this == Null(); }
+
 		//! works with strings, wstrings, char arrays, wchar_t arrays
 		template<typename T>
 		void Set(const T& a_data) {
@@ -59,10 +64,10 @@ namespace CR::Core {
 				    "guids must have 32 chars that are 0-9, a-f, or A-F, other chars are allowed but ignored");
 		}
 
-		unsigned int Data1() const { return m_data[0]; }
-		unsigned int Data2() const { return m_data[1]; }
-		unsigned int Data3() const { return m_data[2]; }
-		unsigned int Data4() const { return m_data[3]; }
+		[[nodiscard]] uint32_t Data1() const { return m_data[0]; }
+		[[nodiscard]] uint32_t Data2() const { return m_data[1]; }
+		[[nodiscard]] uint32_t Data3() const { return m_data[2]; }
+		[[nodiscard]] uint32_t Data4() const { return m_data[3]; }
 
 		unsigned int operator[](int a_index) const {
 			assert(a_index >= 0 && a_index < 4);
@@ -89,7 +94,7 @@ namespace CR::Core {
 			return Convert<std::wstring::value_type, std::wstring::traits_type>(translation, L'{', L'-', L'}');
 		}
 
-		std::string ToStringClean() const {
+		[[nodiscard]] std::string ToStringClean() const {
 			static const char translation[] = {'0', '1', '2', '3', '4', '5', '6', '7',
 			                                   '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
 			return Convert<std::string::value_type, std::string::traits_type>(translation, '\0', '\0', '\0');
@@ -107,26 +112,26 @@ namespace CR::Core {
 				result += a_translation[a_data & 0xf];
 			};
 
-			auto cdata = reinterpret_cast<const unsigned short*>(m_data);
+			auto cdata = reinterpret_cast<const uint16_t*>(m_data);
 			// little endian
-			if(a_firstChar) result += a_firstChar;
+			if(a_firstChar) { result += a_firstChar; }
 			conversion(cdata[1]);
 			conversion(cdata[0]);
-			if(a_seperatorChar) result += a_seperatorChar;
+			if(a_seperatorChar) { result += a_seperatorChar; }
 			conversion(cdata[3]);
-			if(a_seperatorChar) result += a_seperatorChar;
+			if(a_seperatorChar) { result += a_seperatorChar; }
 			conversion(cdata[2]);
-			if(a_seperatorChar) result += a_seperatorChar;
+			if(a_seperatorChar) { result += a_seperatorChar; }
 			conversion(cdata[5]);
-			if(a_seperatorChar) result += a_seperatorChar;
+			if(a_seperatorChar) { result += a_seperatorChar; }
 			conversion(cdata[4]);
 			conversion(cdata[7]);
 			conversion(cdata[6]);
-			if(a_lastChar) result += a_lastChar;
+			if(a_lastChar) { result += a_lastChar; }
 			return result;
 		}
 
-		unsigned int m_data[4];
+		uint32_t m_data[4];
 	};
 }    // namespace CR::Core
 

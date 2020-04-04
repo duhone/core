@@ -12,20 +12,20 @@ namespace CR::Core {
 	    Generally use GetTotalTime and Reset to keep track of the amount of time of a single event.
 	    Use Update only when creating a frame rate type counter.
 	    */
-	class Timer {
+	class Timer final {
 	  public:
 		Timer();
 		//! Total time since timer was created or Reset was called
 		/*!
 		    This will be set back to 0 every time Reset is called.
 		    */
-		double GetTotalTime() const { return totalTime; }
+		[[nodiscard]] double GetTotalTime() const { return totalTime; }
 		//! Time between last 2 calls to Update
 		/*!
 		    Don't use Reset if using this call and Update. Reset will set this back
 		    to 0, and it won't change from that until after the next Update call.
 		    */
-		double GetLastFrameTime() const { return timeLastFrame; }
+		[[nodiscard]] double GetLastFrameTime() const { return timeLastFrame; }
 		//! Reset the total time back to 0.
 		void Reset();
 		void StartFrame();
@@ -41,10 +41,15 @@ namespace CR::Core {
 		double timeLastFrame{0.0};
 	};
 
-	class ScopedTimer {
+	class ScopedTimer final {
 	  public:
 		ScopedTimer(const char* text);
 		~ScopedTimer();
+
+		ScopedTimer(const ScopedTimer&) = delete;
+		ScopedTimer(ScopedTimer&&)      = delete;
+		ScopedTimer& operator=(const ScopedTimer&) = delete;
+		ScopedTimer& operator=(ScopedTimer&&) = delete;
 
 	  private:
 		Timer m_timer;

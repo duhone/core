@@ -2,6 +2,7 @@
 #include "core/Concepts.h"
 #include "core/DefaultOperators.h"
 #include "core/ScopeExit.h"
+
 #include <functional>
 #include <mutex>
 #include <optional>
@@ -13,7 +14,7 @@ namespace CR::Core {
 	class MultiLock;
 
 	template<SemiRegular... T>
-	class Locked : public DefaultOperatorsTotallyOrdered<Locked<T...>> {
+	class Locked final : public DefaultOperatorsTotallyOrdered<Locked<T...>> {
 		template<SemiRegular... T>
 		friend class MultiLock;
 
@@ -29,11 +30,11 @@ namespace CR::Core {
 			std::shared_lock lockOther(other.m_mutex);
 			m_instances = other.m_instances;
 		}
-		Locked(Locked&& other) {
+		Locked(Locked&& other) noexcept {
 			std::unique_lock lockOther(other.m_mutex);
 			m_instances = std::move(other.m_instances);
 		}
-		Locked& operator=(Locked&& other) {
+		Locked& operator=(Locked&& other) noexcept {
 			std::unique_lock lock1(m_mutex, std::defer_lock);
 			std::unique_lock lock2(other.m_mutex, std::defer_lock);
 			std::lock(lock1, lock2);
@@ -123,15 +124,15 @@ namespace CR::Core {
 	};
 
 	template<SemiRegular... T>
-	class MultiLock {
+	class MultiLock final {
 	  public:
 		MultiLock() = delete;    // doesn't make sense to create one of these with no child locks
 		MultiLock(Locked<T>&... a_arg) : m_locks(a_arg...) {}
 		~MultiLock()          = default;
 		MultiLock(MultiLock&) = delete;
 		MultiLock& operator=(MultiLock&) = delete;
-		MultiLock(MultiLock&&)           = default;
-		MultiLock& operator=(MultiLock&&) = default;
+		MultiLock(MultiLock&&) noexcept  = default;
+		MultiLock& operator=(MultiLock&&) noexcept = default;
 
 		template<Callable OperationType>
 		auto operator()(OperationType a_operation) const {

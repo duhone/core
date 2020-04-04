@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "core/algorithm.h"
 #include <string>
 
@@ -15,20 +15,19 @@ namespace CR::Core {
 		wchar_t operator()(char _char) { return static_cast<wchar_t>(_char); }
 	};
 
-	struct Convert {
-		std::string operator()(const std::wstring& _original) {
-			std::string result;
-			result.resize(_original.size());
-			transform(_original, result, UnicodeToAscii());
-			return result;
-		}
-		std::wstring operator()(const std::string& _original) {
-			std::wstring result;
-			result.resize(_original.size());
-			transform(_original, result, AsciiToUnicode());
-			return result;
-		}
-	};
+	[[nodiscard]] std::string Convert(const std::wstring& _original) {
+		std::string result;
+		result.resize(_original.size());
+		transform(_original, result, UnicodeToAscii());
+		return result;
+	}
 
-	bool CaseInsensitiveCompare(const std::wstring& s1, const std::wstring& s2);
+	[[nodiscard]] std::wstring Convert(const std::string& _original) {
+		std::wstring result;
+		result.resize(_original.size());
+		transform(_original, result, AsciiToUnicode());
+		return result;
+	}
+
+	[[nodiscard]] bool CaseInsensitiveCompare(const std::wstring& s1, const std::wstring& s2);
 }    // namespace CR::Core
