@@ -1,4 +1,4 @@
-/*
+﻿/*
     example use
     enum class Shapes
     {
@@ -18,8 +18,10 @@
     */
 #pragma once
 
+#include "core/Log.h"
+
 #include "core/Concepts.h"
-#include <exception>
+
 #include <functional>
 #include <memory>
 #include <unordered_map>
@@ -44,10 +46,9 @@ namespace CR::Core {
 		template<SemiRegular... ArgTypesF>
 		Created Create(Key a_key, ArgTypesF... a_args) {
 			auto iterator = m_creators.find(a_key);
-			if(iterator == m_creators.end())
-				throw std::exception("no registered creater for requested key");
-			else
-				return (iterator->second)(std::forward<ArgTypesF>(a_args)...);
+			Log::Error(iterator != m_creators.end(), "no registered creater for requested key {}", a_key);
+
+			return (iterator->second)(std::forward<ArgTypesF>(a_args)...);
 		}
 
 	  private:

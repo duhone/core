@@ -1,6 +1,8 @@
 ﻿#pragma once
+#include "core//Log.h"
 #include "core/DefaultOperators.h"
 #include "core/algorithm.h"
+
 #include <cassert>
 #include <functional>
 #include <string>
@@ -59,9 +61,8 @@ namespace CR::Core {
 				}
 				iterator++;
 			}
-			if(count != 32)
-				throw std::invalid_argument(
-				    "guids must have 32 chars that are 0-9, a-f, or A-F, other chars are allowed but ignored");
+			Log::Warn(count == 32,
+			          "guids must have 32 chars that are 0-9, a-f, or A-F, other chars are allowed but ignored");
 		}
 
 		[[nodiscard]] uint32_t Data1() const { return m_data[0]; }
