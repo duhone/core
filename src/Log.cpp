@@ -38,14 +38,17 @@ CR::Core::Log::detail::Logger& CR::Core::Log::detail::GetLogger() {
 }
 
 TEST_CASE("Log") {
+	Debug("Testing debug");
+
 	Info("Testing info");
-	Warn("Testing warn");
 
-	// Leave commented out, will crash(on purpose) in debug and release builds
-	// Error("Testing Error");
+	if constexpr(CR_DEBUG || CR_RELEASE) {
+		CHECK_THROWS(Warn(false, "Testing warn"));
+	} else {
+		Warn(false, "Testing warn");
+	}
 
-	// Leave commented out, will crash(on purpose) in all builds
-	// Fail("Testing Fail");
+	CHECK_THROWS(Error("Testing Error"));
 
 	// catch logging interferes with spdlog, so give a little bit of time for spdlog to finish
 	this_thread::sleep_for(250ms);

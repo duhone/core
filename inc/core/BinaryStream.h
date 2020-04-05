@@ -55,9 +55,7 @@ namespace CR::Core {
 	template<typename T>
 	void Read(BinaryReader& a_stream, T& a_out) {
 		static_assert(std::is_standard_layout_v<T>, "template writer for binary streams only supports pod types");
-		if(a_stream.Offset + sizeof(T) > a_stream.Size) {
-			CR::Core::Log::Fail("Tried to read past the end of the buffer");
-		}
+		CR::Core::Log::Error(a_stream.Offset + sizeof(T) <= a_stream.Size, "Tried to read past the end of the buffer");
 		memcpy(&a_out, a_stream.Data + a_stream.Offset, sizeof(T));
 		a_stream.Offset += sizeof(T);
 	}
@@ -67,9 +65,8 @@ namespace CR::Core {
 		uint32_t outSize = 0;
 		Read(a_stream, outSize);
 
-		if(a_stream.Offset + outSize * sizeof(T) > a_stream.Size) {
-			CR::Core::Log::Fail("Tried to read past the end of the buffer");
-		}
+		CR::Core::Log::Error(a_stream.Offset + outSize * sizeof(T) <= a_stream.Size,
+		                     "Tried to read past the end of the buffer");
 
 		a_out.resize(outSize);
 		memcpy(a_out.data(), a_stream.Data + a_stream.Offset, outSize * sizeof(T));

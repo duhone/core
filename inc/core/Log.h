@@ -1,32 +1,55 @@
-#pragma once
+﻿#pragma once
 
-#include "3rdParty/spdlog.h"
+#include <3rdParty/fmt.h>
+#include <3rdParty/spdlog.h>
 
 #include <cassert>
 #include <memory>
 #include <thread>
 
 namespace CR::Core::Log {
-	enum class Level {
-		Info,
-		Warn,
-		Error,    // will abort in debug and release builds
-		Fail      // will abort in all build types
-	};
-#ifdef CR_DEBUG
-	inline constexpr Level c_level = Level::Info;
-#else
-	inline constexpr Level c_level = Level::Warn;
-#endif
+	template<typename... ArgTs>
+	void Debug(const char* a_fmt, ArgTs&&... a_args) {
+		if constexpr(CR_DEBUG) { detail::GetLogger().Debug(a_fmt, std::forward<ArgTs>(a_args)...); }
+	}
+
+	template<typename... ArgTs>
+	void Debug(bool condition, const char* a_fmt, ArgTs&&... a_args) {
+		if(!condition) {
+			if constexpr(CR_DEBUG) { detail::GetLogger().Debug(a_fmt, std::forward<ArgTs>(a_args)...); }
+		}
+	}
 
 	template<typename... ArgTs>
 	void Info(const char* a_fmt, ArgTs&&... a_args) {
-		detail::GetLogger().Info(a_fmt, std::forward<ArgTs>(a_args)...);
+		if constexpr(CR_DEBUG || CR_RELEASE) { detail::GetLogger().Info(a_fmt, std::forward<ArgTs>(a_args)...); }
+	}
+
+	template<typename... ArgTs>
+	void Info(bool condition, const char* a_fmt, ArgTs&&... a_args) {
+		if(!condition) {
+			if constexpr(CR_DEBUG || CR_RELEASE) { detail::GetLogger().Info(a_fmt, std::forward<ArgTs>(a_args)...); }
+		}
 	}
 
 	template<typename... ArgTs>
 	void Warn(const char* a_fmt, ArgTs&&... a_args) {
-		detail::GetLogger().Warn(a_fmt, std::forward<ArgTs>(a_args)...);
+		if constexpr(CR_DEBUG || CR_RELEASE) {
+			detail::GetLogger().Error(a_fmt, std::forward<ArgTs>(a_args)...);
+		} else {
+			detail::GetLogger().Warn(a_fmt, std::forward<ArgTs>(a_args)...);
+		}
+	}
+
+	template<typename... ArgTs>
+	void Warn(bool condition, const char* a_fmt, ArgTs&&... a_args) {
+		if(!condition) {
+			if constexpr(CR_DEBUG || CR_RELEASE) {
+				detail::GetLogger().Error(a_fmt, std::forward<ArgTs>(a_args)...);
+			} else {
+				detail::GetLogger().Warn(a_fmt, std::forward<ArgTs>(a_args)...);
+			}
+		}
 	}
 
 	template<typename... ArgTs>
@@ -35,22 +58,24 @@ namespace CR::Core::Log {
 	}
 
 	template<typename... ArgTs>
-	void Fail(const char* a_fmt, ArgTs&&... a_args) {
-		detail::GetLogger().Fail(a_fmt, std::forward<ArgTs>(a_args)...);
-	}
-
-	template<typename... ArgTs>
-	void Assert(bool condition, const char* a_fmt, ArgTs&&... a_args) {
-		if(!condition) { Fail(a_fmt, std::forward<ArgTs>(a_args)...); }
+	void Error(bool condition, const char* a_fmt, ArgTs&&... a_args) {
+		if(!condition) { detail::GetLogger().Error(a_fmt, std::forward<ArgTs>(a_args)...); }
 	}
 
 	namespace detail {
-		class Logger {
+		class Logger final {
 		  public:
 			Logger();
 			~Logger();
 			Logger(const Logger&) = delete;
+			Logger(Logger&&)      = delete;
 			Logger& operator=(const Logger&) = delete;
+			Logger& operator=(Logger&&) = delete;
+
+			template<typename... ArgTs>
+			void Debug(const char* a_fmt, ArgTs&&... a_args) {
+				m_logger->debug(a_fmt, std::forward<ArgTs>(a_args)...);
+			}
 
 			template<typename... ArgTs>
 			void Info(const char* a_fmt, ArgTs&&... a_args) {
@@ -64,19 +89,9 @@ namespace CR::Core::Log {
 
 			template<typename... ArgTs>
 			void Error(const char* a_fmt, ArgTs&&... a_args) {
-				m_logger->flush();
 				m_logger->error(a_fmt, std::forward<ArgTs>(a_args)...);
-#if defined(CR_DEBUG) || defined(CR_RELEASE)
-				Free();
-				abort();
-#endif
-			}
-
-			template<typename... ArgTs>
-			void Fail(const char* a_fmt, ArgTs&&... a_args) {
-				m_logger->critical(a_fmt, std::forward<ArgTs>(a_args)...);
-				Free();
-				abort();
+				m_logger->flush();
+				throw std::exception(fmt::format(a_fmt, std::forward<ArgTs>(a_args)...).c_str());
 			}
 
 		  private:
