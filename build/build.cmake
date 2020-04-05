@@ -57,7 +57,7 @@ target_link_libraries(core PUBLIC
   spdlog
 )
 
-target_precompile_headers(core PRIVATE 
+target_precompile_headers(core PUBLIC 
 	<3rdParty/doctest.h>
     <3rdParty/fmt.h>
     <3rdParty/function2.h>
