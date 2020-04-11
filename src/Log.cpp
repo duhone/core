@@ -43,12 +43,16 @@ TEST_CASE("Log") {
 	Info("Testing info");
 
 	if constexpr(CR_DEBUG || CR_RELEASE) {
-		CHECK_THROWS(Warn(false, "Testing warn"));
+		CHECK_THROWS(Warn("Testing warn"));
 	} else {
-		Warn(false, "Testing warn");
+		Warn("Testing warn");
 	}
 
 	CHECK_THROWS(Error("Testing Error"));
+
+	if constexpr(CR_DEBUG || CR_RELEASE) { CHECK_THROWS(Assert(false, "Testing assert")); }
+
+	CHECK_THROWS(Require(false, "Testing Require"));
 
 	// catch logging interferes with spdlog, so give a little bit of time for spdlog to finish
 	this_thread::sleep_for(250ms);

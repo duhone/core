@@ -61,8 +61,8 @@ namespace CR::Core {
 				}
 				iterator++;
 			}
-			Log::Warn(count == 32,
-			          "guids must have 32 chars that are 0-9, a-f, or A-F, other chars are allowed but ignored");
+			Log::Assert(count == 32,
+			            "guids must have 32 chars that are 0-9, a-f, or A-F, other chars are allowed but ignored");
 		}
 
 		[[nodiscard]] uint32_t Data1() const { return m_data[0]; }

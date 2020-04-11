@@ -46,7 +46,7 @@ namespace CR::Core {
 		template<SemiRegular... ArgTypesF>
 		Created Create(Key a_key, ArgTypesF... a_args) {
 			auto iterator = m_creators.find(a_key);
-			Log::Error(iterator != m_creators.end(), "no registered creater for requested key {}", a_key);
+			Log::Assert(iterator != m_creators.end(), "no registered creater for requested key {}", a_key);
 
 			return (iterator->second)(std::forward<ArgTypesF>(a_args)...);
 		}
