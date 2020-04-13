@@ -9,12 +9,12 @@
 
 namespace CR::Core::Log {
 	template<typename... ArgTs>
-	void Debug(const char* a_fmt, ArgTs&&... a_args) {
+	void Debug([[maybe_unused]] const char* a_fmt, ArgTs&&... a_args) {
 		if constexpr(CR_DEBUG) { detail::GetLogger().Debug(a_fmt, std::forward<ArgTs>(a_args)...); }
 	}
 
 	template<typename... ArgTs>
-	void Info(const char* a_fmt, ArgTs&&... a_args) {
+	void Info([[maybe_unused]] const char* a_fmt, ArgTs&&... a_args) {
 		if constexpr(CR_DEBUG || CR_RELEASE) { detail::GetLogger().Info(a_fmt, std::forward<ArgTs>(a_args)...); }
 	}
 
@@ -33,7 +33,7 @@ namespace CR::Core::Log {
 	}
 
 	template<typename... ArgTs>
-	void Assert(bool condition, const char* a_fmt, ArgTs&&... a_args) {
+	void Assert(bool condition, [[maybe_unused]] const char* a_fmt, [[maybe_unused]] ArgTs&&... a_args) {
 		if constexpr(CR_DEBUG || CR_RELEASE) {
 			if(!condition) { detail::GetLogger().Error(a_fmt, std::forward<ArgTs>(a_args)...); }
 		} else {
