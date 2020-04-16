@@ -16,6 +16,7 @@ set(PUBLIC_HDRS
     ${root}/inc/core/Locked.h
     ${root}/inc/core/ScopeExit.h
     ${root}/inc/core/Span.h
+    ${root}/inc/core/storage_buffer.h
     ${root}/inc/core/StringUtil.h
     ${root}/inc/core/Timer.h
     ${root}/inc/core/TypeTraits.h
@@ -33,6 +34,7 @@ set(SRCS
     ${root}/src/Log.cpp
 	${root}/src/Misc.cpp
 	${root}/src/Reflection.cpp
+    ${root}/src/storage_buffer.cpp
     ${root}/src/StringUtil.cpp
     ${root}/src/Timer.cpp
 )
