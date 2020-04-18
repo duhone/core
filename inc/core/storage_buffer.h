@@ -29,13 +29,12 @@ namespace CR::Core {
 		// constructors/destructors
 		storage_buffer() noexcept = default;
 		storage_buffer(const Allocator& alloc) noexcept;
-		// deleting moves so I dont have to deal with different types of alocators
-		storage_buffer(storage_buffer&& s) noexcept = delete;
+		storage_buffer(storage_buffer<T, Allocator>&& s) noexcept;
 		~storage_buffer();
 		allocator_type get_allocator() const noexcept;
 
 		// assignment
-		storage_buffer& operator=(storage_buffer&& s) noexcept = delete;
+		storage_buffer& operator=(storage_buffer<T, Allocator>&& s) noexcept;
 		// storage_buffer& operator=(basic_string<T, char_traits<T>, Allocator>&& s);
 		// storage_buffer& operator=(vector<T, Allocator>&& v);
 
@@ -94,6 +93,26 @@ namespace CR::Core {
 
 	template<typename T, typename Allocator>
 	inline storage_buffer<T, Allocator>::storage_buffer(const Allocator& alloc) noexcept : m_allocator(alloc) {}
+
+	template<typename T, typename Allocator>
+	inline storage_buffer<T, Allocator>::storage_buffer(storage_buffer<T, Allocator>&& s) noexcept {
+		*this = std::move(s);
+	}
+
+	template<typename T, typename Allocator>
+	inline storage_buffer<T, Allocator>&
+	    storage_buffer<T, Allocator>::operator=(storage_buffer<T, Allocator>&& s) noexcept {
+		if(m_data) { m_allocator.deallocate(m_data, m_capacity); }
+		m_data     = s.m_data;
+		m_size     = s.m_size;
+		m_capacity = s.m_capacity;
+
+		s.m_data     = nullptr;
+		s.m_size     = 0;
+		s.m_capacity = 0;
+
+		return *this;
+	}
 
 	template<typename T, typename Allocator>
 	inline storage_buffer<T, Allocator>::~storage_buffer() {
