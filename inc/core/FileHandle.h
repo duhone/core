@@ -22,19 +22,19 @@ namespace CR::Core {
 	};
 }    // namespace CR::Core
 
-CR::Core::FileHandle::FileHandle(const std::filesystem::path& a_path) {
+inline CR::Core::FileHandle::FileHandle(const std::filesystem::path& a_path) {
 	fopen_s(&m_file, a_path.string().c_str(), "wb");
 }
 
-CR::Core::FileHandle::~FileHandle() {
+inline CR::Core::FileHandle::~FileHandle() {
 	if(m_file) { fclose(m_file); }
 }
 
-CR::Core::FileHandle::FileHandle(FileHandle&& a_other) noexcept {
+inline CR::Core::FileHandle::FileHandle(FileHandle&& a_other) noexcept {
 	*this = std::move(a_other);
 }
 
-CR::Core::FileHandle& CR::Core::FileHandle::operator=(FileHandle&& a_other) noexcept {
+inline CR::Core::FileHandle& CR::Core::FileHandle::operator=(FileHandle&& a_other) noexcept {
 	if(m_file) { fclose(m_file); }
 	m_file         = a_other.m_file;
 	a_other.m_file = nullptr;
