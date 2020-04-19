@@ -84,6 +84,9 @@ namespace CR::Core {
 		storage_buffer(const storage_buffer&) = delete;
 		storage_buffer& operator=(const storage_buffer&) = delete;
 
+		void clear();
+		void shrink_to_fit();
+
 	  private:
 		T* m_data{nullptr};
 		size_t m_size{0};
@@ -278,4 +281,28 @@ namespace CR::Core {
 		return m_data;
 	}
 
+	template<typename T, typename Allocator>
+	inline void storage_buffer<T, Allocator>::clear() {
+		m_size = 0;
+	}
+
+	template<typename T, typename Allocator>
+	inline void storage_buffer<T, Allocator>::shrink_to_fit() {
+		if(m_size < m_capacity) {
+			T* newData = nullptr;
+			if(m_size > 0) {
+				newData = m_allocator.allocate(m_size);
+				if constexpr(std::is_trivially_copyable_v<T>) {
+					memcpy(newData, m_data, m_size * sizeof(T));
+				} else if constexpr(std::is_move_assignable_v<T>) {
+					for(size_type i = 0; i < m_size; ++i) { newData[i] = std::move(m_data[i]); }
+				} else {
+					for(size_type i = 0; i < m_size; ++i) { newData[i] = m_data[i]; }
+				}
+			}
+			m_allocator.deallocate(m_data, m_capacity);
+			m_data     = newData;
+			m_capacity = m_size;
+		}
+	}
 }    // namespace CR::Core

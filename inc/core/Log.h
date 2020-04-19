@@ -9,12 +9,12 @@
 
 namespace CR::Core::Log {
 	template<typename... ArgTs>
-	void Debug([[maybe_unused]] const char* a_fmt, ArgTs&&... a_args) {
+	void Debug([[maybe_unused]] const char* a_fmt, [[maybe_unused]] ArgTs&&... a_args) {
 		if constexpr(CR_DEBUG) { detail::GetLogger().Debug(a_fmt, std::forward<ArgTs>(a_args)...); }
 	}
 
 	template<typename... ArgTs>
-	void Info([[maybe_unused]] const char* a_fmt, ArgTs&&... a_args) {
+	void Info([[maybe_unused]] const char* a_fmt, [[maybe_unused]] ArgTs&&... a_args) {
 		if constexpr(CR_DEBUG || CR_RELEASE) { detail::GetLogger().Info(a_fmt, std::forward<ArgTs>(a_args)...); }
 	}
 
