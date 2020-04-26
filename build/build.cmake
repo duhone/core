@@ -60,7 +60,6 @@ target_link_libraries(core PUBLIC
 )
 
 target_precompile_headers(core PRIVATE 
-	<3rdParty/doctest.h>
     <3rdParty/fmt.h>
     <3rdParty/function2.h>
     <3rdParty/spdlog.h>
