@@ -50,19 +50,16 @@ add_library(core OBJECT
 )
 
 settingsCR(core)	
-	    
+createPCH(core)
+
 target_include_directories(core PUBLIC "${root}/inc")
 target_link_libraries(core PUBLIC
   doctest
   fmt
   function2
+  glm
+  robinmap
   spdlog
-)
-
-target_precompile_headers(core PRIVATE 
-    <3rdParty/fmt.h>
-    <3rdParty/function2.h>
-    <3rdParty/spdlog.h>
 )
 
 ###############################################
@@ -82,6 +79,7 @@ add_executable(core_tests
 )
 		
 settingsCR(core_tests)
+createPCH(core_tests)
 	
 target_link_libraries(core_tests 
 	doctest
