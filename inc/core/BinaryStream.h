@@ -9,17 +9,20 @@
 #include <vector>
 
 namespace CR::Core {
+	// Returns offset in vector where argument was written
 	template<typename T>
-	void Write(std::vector<std::byte>& a_stream, const T& a_arg) {
+	size_t Write(std::vector<std::byte>& a_stream, const T& a_arg) {
 		if constexpr(std::is_trivially_copyable_v<T>) {
 			auto offset = a_stream.size();
 			a_stream.resize(a_stream.size() + sizeof(T));
 			memcpy(a_stream.data() + offset, &a_arg, sizeof(T));
+			return offset;
 		} else {
 			Write(a_stream, (uint32_t)a_arg.size());
 			auto offset = a_stream.size();
 			a_stream.resize(a_stream.size() + a_arg.size() * sizeof(T::value_type));
 			memcpy(a_stream.data() + offset, a_arg.data(), a_arg.size() * sizeof(T::value_type));
+			return offset;
 		}
 	}
 
