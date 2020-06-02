@@ -14,6 +14,7 @@ set(PUBLIC_HDRS
     ${root}/inc/core/Guid.h
     ${root}/inc/core/literals.h
     ${root}/inc/core/Locked.h
+    ${root}/inc/core/Random.h
     ${root}/inc/core/ScopeExit.h
     ${root}/inc/core/Span.h
     ${root}/inc/core/storage_buffer.h
@@ -26,17 +27,18 @@ set(PUBLIC_HDRS
 )
 
 set(SRCS
-	${root}/src/BinaryStream.cpp
+  ${root}/src/BinaryStream.cpp
 	${root}/src/Function.cpp
 	${root}/src/Guid.cpp
-    ${root}/src/Hash.cpp
+  ${root}/src/Hash.cpp
 	${root}/src/Locked.cpp
-    ${root}/src/Log.cpp
+  ${root}/src/Log.cpp
 	${root}/src/Misc.cpp
+	${root}/src/Random.cpp
 	${root}/src/Reflection.cpp
-    ${root}/src/storage_buffer.cpp
-    ${root}/src/StringUtil.cpp
-    ${root}/src/Timer.cpp
+  ${root}/src/storage_buffer.cpp
+  ${root}/src/StringUtil.cpp
+  ${root}/src/Timer.cpp
 )
 
 set(BUILD
