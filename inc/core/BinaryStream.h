@@ -58,7 +58,7 @@ namespace CR::Core {
 			uint32_t outSize = 0;
 			Read(a_stream, outSize);
 
-			CR::Core::Log::Assert(a_stream.Offset + outSize * sizeof(T::value_type) <= a_stream.Size,
+			CR::Core::Log::Assert(a_stream.Offset + outSize * sizeof(typename T::value_type) <= a_stream.Size,
 			                      "Tried to read past the end of the buffer");
 
 			a_out.resize(outSize);

@@ -45,7 +45,7 @@ set(BUILD
     ${root}/build/build.cmake
 )
 
-add_library(core OBJECT 
+add_library(core 
   ${PUBLIC_HDRS} 
   ${SRCS} 
   ${BUILD}
@@ -81,7 +81,7 @@ add_executable(core_tests
 )
 		
 settingsCR(core_tests)
-createPCH(core_tests)
+usePCH(core_tests core)
 	
 target_link_libraries(core_tests 
 	doctest
