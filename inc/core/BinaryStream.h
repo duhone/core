@@ -47,13 +47,17 @@ namespace CR::Core {
 		uint32_t Size{0};
 	};
 
+	// returns true if was able to read T, false other wise, which is not an error if the previous read ended at exactly
+	// the end of the stream.
 	template<typename T>
-	void Read(BinaryReader& a_stream, T& a_out) {
+	bool Read(BinaryReader& a_stream, T& a_out) {
+		if(a_stream.Offset == a_stream.Size) { return false; }
 		if constexpr(std::is_trivially_copyable_v<T>) {
 			CR::Core::Log::Assert(a_stream.Offset + sizeof(T) <= a_stream.Size,
 			                      "Tried to read past the end of the buffer");
 			memcpy(&a_out, a_stream.Data + a_stream.Offset, sizeof(T));
 			a_stream.Offset += sizeof(T);
+			return true;
 		} else {
 			uint32_t outSize = 0;
 			Read(a_stream, outSize);
@@ -64,6 +68,7 @@ namespace CR::Core {
 			a_out.resize(outSize);
 			memcpy(a_out.data(), a_stream.Data + a_stream.Offset, outSize * sizeof(T::value_type));
 			a_stream.Offset += outSize * sizeof(T::value_type);
+			return true;
 		}
 	}
 }    // namespace CR::Core
