@@ -19,6 +19,7 @@ set(PUBLIC_HDRS
     ${root}/inc/core/Span.h
     ${root}/inc/core/storage_buffer.h
     ${root}/inc/core/StringUtil.h
+    ${root}/inc/core/Table.h
     ${root}/inc/core/Timer.h
     ${root}/inc/core/TypeTraits.h
     ${root}/inc/core/Reflection.h
@@ -27,18 +28,19 @@ set(PUBLIC_HDRS
 )
 
 set(SRCS
-  ${root}/src/BinaryStream.cpp
+    ${root}/src/BinaryStream.cpp
 	${root}/src/Function.cpp
-	${root}/src/Guid.cpp
-  ${root}/src/Hash.cpp
-	${root}/src/Locked.cpp
-  ${root}/src/Log.cpp
-	${root}/src/Misc.cpp
-	${root}/src/Random.cpp
-	${root}/src/Reflection.cpp
-  ${root}/src/storage_buffer.cpp
-  ${root}/src/StringUtil.cpp
-  ${root}/src/Timer.cpp
+    ${root}/src/Guid.cpp
+    ${root}/src/Hash.cpp
+    ${root}/src/Locked.cpp
+    ${root}/src/Log.cpp
+    ${root}/src/Misc.cpp
+    ${root}/src/Random.cpp
+    ${root}/src/Reflection.cpp
+    ${root}/src/storage_buffer.cpp
+    ${root}/src/StringUtil.cpp
+    ${root}/src/Table.cpp
+    ${root}/src/Timer.cpp
 )
 
 set(BUILD
@@ -73,6 +75,7 @@ set(SRCS
 	${root}/tests/ClassFactoryTest2.cpp
 	${root}/tests/ClassFactoryTestInterface.h
 	${root}/tests/ClassFactoryTestInterface.cpp
+	${root}/tests/Table.cpp
 	${root}/tests/main.cpp
 )
 
