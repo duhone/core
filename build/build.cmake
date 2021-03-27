@@ -40,6 +40,7 @@ set(SRCS
     ${root}/src/storage_buffer.cpp
     ${root}/src/StringUtil.cpp
     ${root}/src/Table.cpp
+    ${root}/src/TypeTraits.cpp
     ${root}/src/Timer.cpp
 )
 
@@ -76,6 +77,7 @@ set(SRCS
 	${root}/tests/ClassFactoryTestInterface.h
 	${root}/tests/ClassFactoryTestInterface.cpp
 	${root}/tests/Table.cpp
+	${root}/tests/TypeTraits.cpp
 	${root}/tests/main.cpp
 )
 

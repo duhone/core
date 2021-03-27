@@ -23,13 +23,13 @@ TEST_CASE("table_simple") {
 
 	REQUIRE(table.GetIndex(0) == t_Table::c_unused);
 
-	// int preConstructed = Row::numConstructed;
-	// int preDestructed  = Row::numDestructed;
+	int preConstructed = Row::numConstructed;
+	int preDestructed  = Row::numDestructed;
 
 	[[maybe_unused]] uint16_t index = table.CreateRow(0);
 	REQUIRE(table.GetIndex(0) != t_Table::c_unused);
-	// REQUIRE(preConstructed == Row::numConstructed);
-	// REQUIRE(preDestructed == Row::numDestructed);
+	REQUIRE(preConstructed == Row::numConstructed);
+	REQUIRE(preDestructed == Row::numDestructed);
 
 	auto& row = table.GetRow<Row>(index);
 	row.foo1  = 2;

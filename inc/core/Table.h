@@ -100,21 +100,24 @@ void CR::Core::Table<t_primaryKey, t_rows...>::ClearRows(uint16_t a_index, std::
 
 template<typename t_primaryKey, typename... t_rows>
 inline uint16_t CR::Core::Table<t_primaryKey, t_rows...>::CreateRow(t_primaryKey&& a_key, t_rows&&... a_rows) {
-	uint16_t unusedIndex = FindUnused();
-	Log::Require(unusedIndex != c_maxSize, "Ran out of available rows in table {}", m_tableName);
+	uint16_t unusedIndex = CreateRow(a_key);
 
-	m_lookUp.emplace(a_key, unusedIndex);
-	m_primaryKeys[unusedIndex] = std::move(a_key);
 	ClearRows(unusedIndex, std::index_sequence_for<t_rows...>{}, std::move(a_rows)...);
-
-	m_used[unusedIndex] = true;
 
 	return unusedIndex;
 }
 
 template<typename t_primaryKey, typename... t_rows>
 inline uint16_t CR::Core::Table<t_primaryKey, t_rows...>::CreateRow(t_primaryKey&& a_key) {
-	return CreateRow(std::move(a_key), t_rows{}...);
+	uint16_t unusedIndex = FindUnused();
+	Log::Require(unusedIndex != c_maxSize, "Ran out of available rows in table {}", m_tableName);
+
+	m_lookUp.emplace(a_key, unusedIndex);
+	m_primaryKeys[unusedIndex] = std::move(a_key);
+
+	m_used[unusedIndex] = true;
+
+	return unusedIndex;
 }
 
 template<typename t_primaryKey, typename... t_rows>
@@ -149,7 +152,7 @@ inline void CR::Core::Table<t_primaryKey, t_rows...>::DeleteRow(uint16_t a_index
 
 	m_used[a_index] = false;
 
-	// To save on memory, if not a standard layout, then clear out the data, assuming if not standard layout
+	// To save on memory, if not a standard layout, then clear out the data. Hopefully if not standard layout
 	// then a proper move assignment was written.
 	if constexpr(!std::is_standard_layout_v<t_primaryKey>) { m_primaryKeys[a_index] = t_primaryKey{}; }
 	ClearRows(a_index, std::index_sequence_for<t_rows...>{}, t_rows{}...);
