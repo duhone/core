@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include <core/Log.h>
+#include <core/TypeTraits.h>
 
 #include <3rdParty/robinmap.h>
 
@@ -20,6 +21,8 @@ namespace CR::Core {
 	// compact.
 	template<typename t_primaryKey, typename... t_rows>
 	class Table {
+		static_assert(is_unique_v<t_rows...>, "row types must be unique currently");
+
 		// Using arrays currently, and std::bitset. For larger tables need a bitset replacement(which would help here
 		// too). And should use std::vector instead of arrays for larger tables.
 		static constexpr uint16_t c_maxSize = 512;
