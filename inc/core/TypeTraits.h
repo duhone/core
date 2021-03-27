@@ -20,17 +20,18 @@ namespace CR::Core {
 	template<typename T, typename... Rest>
 	inline constexpr bool is_one_of_v = is_one_of<T, Rest...>::value;
 
-	template<typename T, typename... Rest>
+	template<typename... Rest>
 	struct is_unique;
 
-	template<typename T>
+	template<class T>
 	struct is_unique<T> : std::true_type {};
 
-	template<typename T, typename... Rest>
-	struct is_unique<T, T, Rest...> : std::false_type {};
+	template<class First, class Second>
+	struct is_unique<First, Second> : std::negation<std::is_same<First, Second>> {};
 
-	template<typename T, typename First, typename... Rest>
-	struct is_unique<T, First, Rest...> : is_unique<T, Rest...> {};
+	template<class First, class Second, class... Rest>
+	struct is_unique<First, Second, Rest...>
+	    : std::conjunction<is_unique<First, Second>, is_unique<First, Rest...>, is_unique<Second, Rest...>> {};
 
 	template<typename T, typename... Rest>
 	using is_unique_t = typename is_unique<T, Rest...>::type;
