@@ -17,8 +17,7 @@ namespace CR::Core {
 	// the primary key. You can have more than one t_column type. This allows creating a SOAOS layout. The primary key
 	// is in one array, and each column in an array. You can iterate the rows of the table for just one column. You can
 	// grab multiple iterators if you need to walk multiple columns at once. The fastest way to get to a row for a
-	// column is by index, not by primary key, you can save these indices for future use. In general indices are stable.
-	// The function compact will invalidate them however, there is rarely a need to call compact.
+	// column is by index, not by primary key, you can save these indices for future use. Indices are stable.
 	template<typename t_primaryKey, typename... t_columns>
 	class Table {
 		static_assert(is_unique_v<t_columns...>, "column types must be unique currently");
@@ -61,12 +60,127 @@ namespace CR::Core {
 
 		void erase(uint16_t a_index);
 
+		template<typename... t_columnsSubset>
+		class Iterator {
+		  public:
+			using iterator_category = std::bidirectional_iterator_tag;
+			using difference_type   = std::ptrdiff_t;
+			using value_type        = std::tuple<std::reference_wrapper<t_columnsSubset>...>;
+			using pointer           = value_type*;
+			using reference         = value_type&;
+
+			Iterator() = delete;
+			Iterator(Table& a_table, uint16_t a_index);
+			~Iterator()                   = default;
+			Iterator(const Iterator&)     = default;
+			Iterator(Iterator&&) noexcept = default;
+			Iterator& operator=(const Iterator&) = default;
+			Iterator& operator=(Iterator&&) noexcept = default;
+
+			reference operator*() { return m_value; }
+			pointer operator->() { return &m_value; }
+
+			Iterator& operator++();
+			Iterator& operator++(int);
+
+			friend bool operator==(const Iterator& a_first, const Iterator& a_second) {
+				// defining inline, because out of line is a real pain for this one.
+				if(&a_first.m_table != &a_second.m_table) { return false; }
+				return a_first.m_index == a_second.m_index;
+			}
+			friend bool operator!=(const Iterator& a_first, const Iterator& a_second) { return !(a_first == a_second); }
+
+		  private:
+			Table& m_table;
+			uint16_t m_index{0};
+			value_type m_value;
+		};
+
+		template<typename t_column>
+		class ConstIterator {
+		  public:
+			using iterator_category = std::bidirectional_iterator_tag;
+			using difference_type   = std::ptrdiff_t;
+			using value_type        = const t_column;
+			using pointer           = const t_column*;
+			using reference         = const t_column&;
+
+			ConstIterator() = delete;
+			ConstIterator(Table& a_table, uint16_t a_index) : m_table(a_table), m_index(a_index) {}
+			~ConstIterator()                        = default;
+			ConstIterator(const ConstIterator&)     = default;
+			ConstIterator(ConstIterator&&) noexcept = default;
+			ConstIterator& operator=(const ConstIterator&) = default;
+			ConstIterator& operator=(ConstIterator&&) noexcept = default;
+
+			reference operator*() const;
+			pointer operator->() const;
+
+			ConstIterator& operator++();
+			ConstIterator& operator++(int);
+
+			friend bool operator==(const ConstIterator& a, const ConstIterator& b) {
+				// defining inline, because out of line is a real pain for this one.
+				if(&a_first.m_table != &a_second.m_table) { return false; }
+				return a_first.m_index == a_second.m_index;
+			}
+			friend bool operator!=(const ConstIterator& a, const ConstIterator& b) { return !(a_first == a_second); }
+
+		  private:
+			Table& m_table;
+			uint16_t m_index{0};
+		};
+
+		template<typename... t_columnsSubset>
+		class ColumnSet {
+		  public:
+			ColumnSet() = delete;
+			ColumnSet(Table& a_table) : m_table(a_table) {}
+			~ColumnSet()                    = default;
+			ColumnSet(const ColumnSet&)     = default;
+			ColumnSet(ColumnSet&&) noexcept = default;
+			ColumnSet& operator=(const ColumnSet&) = default;
+			ColumnSet& operator=(ColumnSet&&) noexcept = default;
+
+			Iterator<t_columnsSubset...> begin() { return Iterator<t_columnsSubset...>(m_table, 0); }
+			Iterator<t_columnsSubset...> end() { return Iterator<t_columnsSubset...>(m_table, c_maxSize); }
+			/*ConstIterator begin() const { return ConstIterator(&this, 0); }
+			ConstIterator end() const { return ConstIterator(&this, c_maxSize); }
+			ConstIterator cbegin() const { return ConstIterator(&this, 0); }
+			ConstIterator cend() const { return ConstIterator(&this, c_maxSize); }*/
+
+		  private:
+			Table& m_table;
+		};
+
+		template<typename... t_columnsSubset>
+		[[nodiscard]] ColumnSet<t_columnsSubset...> GetColumnSet() {
+			return ColumnSet<t_columnsSubset...>(*this);
+		}
+
+		template<typename... t_columnsSubset>
+		[[nodiscard]] const ColumnSet<t_columnsSubset...> GetColumnSet() const {
+			return ColumnSet<t_columnsSubset...>(*this);
+		}
+
+		/*
+		Iterator begin() { return Iterator(&this, 0); }
+		Iteartor end() { return Iterator(&this, c_maxSize); }
+		ConstIterator begin() const { return ConstIterator(&this, 0); }
+		ConstIterator end() const { return ConstIterator(&this, c_maxSize); }
+		ConstIterator cbegin() const { return ConstIterator(&this, 0); }
+		ConstIterator cend() const { return ConstIterator(&this, c_maxSize); }
+		*/
+
 	  private:
 		// returns c_maxSize if couldn't find one
 		[[nodiscard]] uint16_t FindUnused();
 
+		template<typename t_column>
+		void ClearColumnDefault(uint16_t a_index);
 		template<size_t index, typename t_column>
 		void ClearColumn(uint16_t a_index, t_column&& a_column);
+		void ClearRowDefault(uint16_t a_index);
 		template<size_t... tupleIndices>
 		void ClearRow(uint16_t a_index, std::index_sequence<tupleIndices...>, t_columns&&... row);
 
@@ -88,10 +202,21 @@ inline uint16_t CR::Core::Table<t_primaryKey, t_columns...>::FindUnused() {
 }
 
 template<typename t_primaryKey, typename... t_columns>
+template<typename t_column>
+void CR::Core::Table<t_primaryKey, t_columns...>::ClearColumnDefault([[maybe_unused]] uint16_t a_index) {
+	if constexpr(!std::is_standard_layout_v<t_column>) { std::get<t_column>(m_rows)[a_index] = t_column{}; }
+}
+
+template<typename t_primaryKey, typename... t_columns>
 template<size_t index, typename t_column>
 void CR::Core::Table<t_primaryKey, t_columns...>::ClearColumn([[maybe_unused]] uint16_t a_index,
                                                               [[maybe_unused]] t_column&& a_column) {
 	if constexpr(!std::is_standard_layout_v<t_column>) { std::get<index>(m_rows)[a_index] = std::move(a_column); }
+}
+
+template<typename t_primaryKey, typename... t_columns>
+void CR::Core::Table<t_primaryKey, t_columns...>::ClearRowDefault(uint16_t a_index) {
+	(ClearColumnDefault<t_columns>(a_index), ...);
 }
 
 template<typename t_primaryKey, typename... t_columns>
@@ -161,5 +286,74 @@ inline void CR::Core::Table<t_primaryKey, t_columns...>::erase(uint16_t a_index)
 	// To save on memory, if not a standard layout, then clear out the data. Hopefully if not standard layout
 	// then a proper move assignment was written.
 	if constexpr(!std::is_standard_layout_v<t_primaryKey>) { m_primaryKeys[a_index] = t_primaryKey{}; }
-	ClearRow(a_index, std::index_sequence_for<t_columns...>{}, t_columns{}...);
+	ClearRowDefault(a_index);
+}
+
+template<typename t_primaryKey, typename... t_columns>
+template<typename... t_columnsSubset>
+CR::Core::Table<t_primaryKey, t_columns...>::Iterator<t_columnsSubset...>::Iterator(Table& a_table, uint16_t a_index) :
+    m_table(a_table), m_index(a_index), m_value(std::get<std::array<t_columnsSubset, c_maxSize>>(
+                                            m_table.m_rows)[std::min<uint16_t>(m_index, c_maxSize - 1)]...) {
+	// Need the min because have to put something in value, its a tuple of references, if its an end iterator, then just
+	// throw last element in.
+}
+
+/*
+template<typename t_primaryKey, typename... t_columns>
+template<typename... t_columnsSubset>
+auto CR::Core::Table<t_primaryKey, t_columns...>::Iterator<t_columnsSubset...>::operator*() const -> reference {
+    return std::get<t_column>(m_table.m_rows)[m_index];
+}
+
+template<typename t_primaryKey, typename... t_columns>
+template<typename t_column>
+auto CR::Core::Table<t_primaryKey, t_columns...>::Iterator<t_column>::operator->() const -> pointer {
+    return &std::get<t_column>(m_table.m_rows)[m_index];
+}*/
+
+template<typename t_primaryKey, typename... t_columns>
+template<typename... t_columnsSubset>
+auto CR::Core::Table<t_primaryKey, t_columns...>::Iterator<t_columnsSubset...>::operator++() -> Iterator& {
+	m_index = std::min(++m_index, c_maxSize);
+	while(m_index < c_maxSize && !m_table.m_used[m_index]) { ++m_index; }
+	value_type newValue(std::get<std::array<t_columnsSubset, c_maxSize>>(
+	    m_table.m_rows)[std::min<uint16_t>(m_index, c_maxSize - 1)]...);
+	std::swap(m_value, newValue);
+	return *this;
+}
+
+template<typename t_primaryKey, typename... t_columns>
+template<typename... t_columnsSubset>
+auto CR::Core::Table<t_primaryKey, t_columns...>::Iterator<t_columnsSubset...>::operator++(int) -> Iterator& {
+	Iterator tmp = *this;
+	++(*this);
+	return tmp;
+}
+
+template<typename t_primaryKey, typename... t_columns>
+template<typename t_column>
+auto CR::Core::Table<t_primaryKey, t_columns...>::ConstIterator<t_column>::operator*() const -> reference {
+	return std::get<t_column>(m_table.m_rows)[m_index];
+}
+
+template<typename t_primaryKey, typename... t_columns>
+template<typename t_column>
+auto CR::Core::Table<t_primaryKey, t_columns...>::ConstIterator<t_column>::operator->() const -> pointer {
+	return &std::get<t_column>(m_table.m_rows)[m_index];
+}
+
+template<typename t_primaryKey, typename... t_columns>
+template<typename t_column>
+auto CR::Core::Table<t_primaryKey, t_columns...>::ConstIterator<t_column>::operator++() -> ConstIterator& {
+	m_index = std::min(++m_index, c_maxSize);
+	while(m_index < c_maxSize && !m_table.m_used[m_index]) { ++m_index; }
+	return *this;
+}
+
+template<typename t_primaryKey, typename... t_columns>
+template<typename t_column>
+auto CR::Core::Table<t_primaryKey, t_columns...>::ConstIterator<t_column>::operator++(int) -> ConstIterator& {
+	Iterator tmp = *this;
+	++(*this);
+	return tmp;
 }
