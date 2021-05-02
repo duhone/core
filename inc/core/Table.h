@@ -35,7 +35,7 @@ namespace CR::Core {
 		// A system wide constant, need to find a better place for it. Its duplicated in many public interfaces
 		inline static constexpr uint16_t c_unused{0xffff};
 
-		Table(std::string_view a_tableName) : m_tableName(a_tableName){};
+		Table(std::string_view a_tableName) : m_tableName(a_tableName), m_defaultView(GetView<t_columns...>()){};
 		~Table() = default;
 
 		Table(const Table&) = delete;
@@ -64,10 +64,12 @@ namespace CR::Core {
 		class Iterator {
 		  public:
 			using iterator_category = std::bidirectional_iterator_tag;
-			using difference_type   = std::ptrdiff_t;
-			using value_type        = std::tuple<std::reference_wrapper<t_columnsSubset>...>;
-			using pointer           = value_type*;
-			using reference         = value_type&;
+			using difference_type   = int32_t;
+			using value_type        = std::tuple<t_columnsSubset...>;
+			using pointer           = std::tuple<t_columnsSubset*...>;
+			using reference         = std::tuple<t_columnsSubset&...>;
+
+			// using internal_value_type = std::tuple<std::reference_wrapper<t_columnsSubset>...>;
 
 			Iterator() = delete;
 			Iterator(Table& a_table, uint16_t a_index);
@@ -77,8 +79,10 @@ namespace CR::Core {
 			Iterator& operator=(const Iterator&) = default;
 			Iterator& operator=(Iterator&&) noexcept = default;
 
-			reference operator*() { return m_value; }
-			pointer operator->() { return &m_value; }
+			reference operator*();
+			//{ return m_value; }
+			pointer operator->();
+			//{ return &m_value; }
 
 			Iterator& operator++();
 			Iterator& operator++(int);
@@ -93,7 +97,7 @@ namespace CR::Core {
 		  private:
 			Table& m_table;
 			uint16_t m_index{0};
-			value_type m_value;
+			// internal_value_type m_value;
 		};
 
 		template<typename t_column>
@@ -131,19 +135,19 @@ namespace CR::Core {
 			uint16_t m_index{0};
 		};
 
-		template<typename... t_columnsSubset>
-		class ColumnSet {
+		template<typename... t_viewSubset>
+		class View {
 		  public:
-			ColumnSet() = delete;
-			ColumnSet(Table& a_table) : m_table(a_table) {}
-			~ColumnSet()                    = default;
-			ColumnSet(const ColumnSet&)     = default;
-			ColumnSet(ColumnSet&&) noexcept = default;
-			ColumnSet& operator=(const ColumnSet&) = default;
-			ColumnSet& operator=(ColumnSet&&) noexcept = default;
+			View() = delete;
+			View(Table& a_table) : m_table(a_table) {}
+			~View()               = default;
+			View(const View&)     = default;
+			View(View&&) noexcept = default;
+			View& operator=(const View&) = default;
+			View& operator=(View&&) noexcept = default;
 
-			Iterator<t_columnsSubset...> begin() { return Iterator<t_columnsSubset...>(m_table, 0); }
-			Iterator<t_columnsSubset...> end() { return Iterator<t_columnsSubset...>(m_table, c_maxSize); }
+			Iterator<t_viewSubset...> begin() { return Iterator<t_viewSubset...>(m_table, 0); }
+			Iterator<t_viewSubset...> end() { return Iterator<t_viewSubset...>(m_table, c_maxSize); }
 			/*ConstIterator begin() const { return ConstIterator(&this, 0); }
 			ConstIterator end() const { return ConstIterator(&this, c_maxSize); }
 			ConstIterator cbegin() const { return ConstIterator(&this, 0); }
@@ -153,20 +157,20 @@ namespace CR::Core {
 			Table& m_table;
 		};
 
-		template<typename... t_columnsSubset>
-		[[nodiscard]] ColumnSet<t_columnsSubset...> GetColumnSet() {
-			return ColumnSet<t_columnsSubset...>(*this);
+		template<typename... t_viewSubset>
+		[[nodiscard]] View<t_viewSubset...> GetView() {
+			return View<t_viewSubset...>(*this);
 		}
 
-		template<typename... t_columnsSubset>
-		[[nodiscard]] const ColumnSet<t_columnsSubset...> GetColumnSet() const {
-			return ColumnSet<t_columnsSubset...>(*this);
+		template<typename... t_viewSubset>
+		[[nodiscard]] const View<t_viewSubset...> GetView() const {
+			return View<t_viewSubset...>(*this);
 		}
 
-		/*
-		Iterator begin() { return Iterator(&this, 0); }
-		Iteartor end() { return Iterator(&this, c_maxSize); }
-		ConstIterator begin() const { return ConstIterator(&this, 0); }
+		Iterator<t_columns...> begin() { return m_defaultView.begin(); }
+		Iterator<t_columns...> end() { return m_defaultView.end(); }
+
+		/*ConstIterator begin() const { return ConstIterator(&this, 0); }
 		ConstIterator end() const { return ConstIterator(&this, c_maxSize); }
 		ConstIterator cbegin() const { return ConstIterator(&this, 0); }
 		ConstIterator cend() const { return ConstIterator(&this, c_maxSize); }
@@ -189,6 +193,7 @@ namespace CR::Core {
 		t_primaryKey m_primaryKeys[c_maxSize];
 		tsl::robin_map<t_primaryKey, uint16_t> m_lookUp;
 		std::tuple<std::array<t_columns, c_maxSize>...> m_rows;
+		View<t_columns...> m_defaultView;
 	};
 }    // namespace CR::Core
 
@@ -292,11 +297,7 @@ inline void CR::Core::Table<t_primaryKey, t_columns...>::erase(uint16_t a_index)
 template<typename t_primaryKey, typename... t_columns>
 template<typename... t_columnsSubset>
 CR::Core::Table<t_primaryKey, t_columns...>::Iterator<t_columnsSubset...>::Iterator(Table& a_table, uint16_t a_index) :
-    m_table(a_table), m_index(a_index), m_value(std::get<std::array<t_columnsSubset, c_maxSize>>(
-                                            m_table.m_rows)[std::min<uint16_t>(m_index, c_maxSize - 1)]...) {
-	// Need the min because have to put something in value, its a tuple of references, if its an end iterator, then just
-	// throw last element in.
-}
+    m_table(a_table), m_index(a_index) {}
 
 /*
 template<typename t_primaryKey, typename... t_columns>
@@ -316,9 +317,9 @@ template<typename... t_columnsSubset>
 auto CR::Core::Table<t_primaryKey, t_columns...>::Iterator<t_columnsSubset...>::operator++() -> Iterator& {
 	m_index = std::min(++m_index, c_maxSize);
 	while(m_index < c_maxSize && !m_table.m_used[m_index]) { ++m_index; }
-	value_type newValue(std::get<std::array<t_columnsSubset, c_maxSize>>(
+	/*value_type newValue(std::get<std::array<t_columnsSubset, c_maxSize>>(
 	    m_table.m_rows)[std::min<uint16_t>(m_index, c_maxSize - 1)]...);
-	std::swap(m_value, newValue);
+	std::swap(m_value, newValue);*/
 	return *this;
 }
 
@@ -328,6 +329,18 @@ auto CR::Core::Table<t_primaryKey, t_columns...>::Iterator<t_columnsSubset...>::
 	Iterator tmp = *this;
 	++(*this);
 	return tmp;
+}
+
+template<typename t_primaryKey, typename... t_columns>
+template<typename... t_columnsSubset>
+auto CR::Core::Table<t_primaryKey, t_columns...>::Iterator<t_columnsSubset...>::operator*() -> reference {
+	return reference{std::get<std::array<t_columnsSubset, c_maxSize>>(m_table.m_rows)[m_index]...};
+}
+
+template<typename t_primaryKey, typename... t_columns>
+template<typename... t_columnsSubset>
+auto CR::Core::Table<t_primaryKey, t_columns...>::Iterator<t_columnsSubset...>::operator->() -> pointer {
+	return pointer{(&std::get<std::array<t_columnsSubset, c_maxSize>>(m_table.m_rows)[m_index])...};
 }
 
 template<typename t_primaryKey, typename... t_columns>
