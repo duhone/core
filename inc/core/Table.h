@@ -80,15 +80,15 @@ namespace CR::Core {
 			Iterator& operator=(Iterator&&) noexcept = default;
 
 			reference operator*();
-			//{ return m_value; }
 			pointer operator->();
-			//{ return &m_value; }
 
 			Iterator& operator++();
 			Iterator& operator++(int);
 
+			Iterator& operator--();
+			Iterator& operator--(int);
+
 			friend bool operator==(const Iterator& a_first, const Iterator& a_second) {
-				// defining inline, because out of line is a real pain for this one.
 				if(&a_first.m_table != &a_second.m_table) { return false; }
 				return a_first.m_index == a_second.m_index;
 			}
@@ -97,34 +97,35 @@ namespace CR::Core {
 		  private:
 			Table& m_table;
 			uint16_t m_index{0};
-			// internal_value_type m_value;
 		};
 
-		template<typename t_column>
+		template<typename... t_columnsSubset>
 		class ConstIterator {
 		  public:
 			using iterator_category = std::bidirectional_iterator_tag;
-			using difference_type   = std::ptrdiff_t;
-			using value_type        = const t_column;
-			using pointer           = const t_column*;
-			using reference         = const t_column&;
+			using difference_type   = int32_t;
+			using value_type        = std::tuple<const t_columnsSubset...>;
+			using pointer           = std::tuple<const t_columnsSubset*...>;
+			using reference         = std::tuple<const t_columnsSubset&...>;
 
 			ConstIterator() = delete;
-			ConstIterator(Table& a_table, uint16_t a_index) : m_table(a_table), m_index(a_index) {}
+			ConstIterator(Table& a_table, uint16_t a_index);
 			~ConstIterator()                        = default;
 			ConstIterator(const ConstIterator&)     = default;
 			ConstIterator(ConstIterator&&) noexcept = default;
 			ConstIterator& operator=(const ConstIterator&) = default;
 			ConstIterator& operator=(ConstIterator&&) noexcept = default;
 
-			reference operator*() const;
-			pointer operator->() const;
+			reference operator*();
+			pointer operator->();
 
 			ConstIterator& operator++();
 			ConstIterator& operator++(int);
 
+			ConstIterator& operator--();
+			ConstIterator& operator--(int);
+
 			friend bool operator==(const ConstIterator& a, const ConstIterator& b) {
-				// defining inline, because out of line is a real pain for this one.
 				if(&a_first.m_table != &a_second.m_table) { return false; }
 				return a_first.m_index == a_second.m_index;
 			}
@@ -148,10 +149,10 @@ namespace CR::Core {
 
 			Iterator<t_viewSubset...> begin() { return Iterator<t_viewSubset...>(m_table, 0); }
 			Iterator<t_viewSubset...> end() { return Iterator<t_viewSubset...>(m_table, c_maxSize); }
-			/*ConstIterator begin() const { return ConstIterator(&this, 0); }
-			ConstIterator end() const { return ConstIterator(&this, c_maxSize); }
-			ConstIterator cbegin() const { return ConstIterator(&this, 0); }
-			ConstIterator cend() const { return ConstIterator(&this, c_maxSize); }*/
+			ConstIterator<t_viewSubset...> begin() const { return ConstIterator<t_viewSubset...>(&this, 0); }
+			ConstIterator<t_viewSubset...> end() const { return ConstIterator<t_viewSubset...>(&this, c_maxSize); }
+			ConstIterator<t_viewSubset...> cbegin() const { return ConstIterator<t_viewSubset...>(&this, 0); }
+			ConstIterator<t_viewSubset...> cend() const { return ConstIterator<t_viewSubset...>(&this, c_maxSize); }
 
 		  private:
 			Table& m_table;
@@ -170,11 +171,10 @@ namespace CR::Core {
 		Iterator<t_columns...> begin() { return m_defaultView.begin(); }
 		Iterator<t_columns...> end() { return m_defaultView.end(); }
 
-		/*ConstIterator begin() const { return ConstIterator(&this, 0); }
-		ConstIterator end() const { return ConstIterator(&this, c_maxSize); }
-		ConstIterator cbegin() const { return ConstIterator(&this, 0); }
-		ConstIterator cend() const { return ConstIterator(&this, c_maxSize); }
-		*/
+		ConstIterator<t_columns...> begin() const { return m_defaultView.begin(); }
+		ConstIterator<t_columns...> end() const { return m_defaultView.end(); }
+		ConstIterator<t_columns...> cbegin() const { return m_defaultView.cbegin(); }
+		ConstIterator<t_columns...> cend() const { return m_defaultView.cend(); }
 
 	  private:
 		// returns c_maxSize if couldn't find one
@@ -294,32 +294,23 @@ inline void CR::Core::Table<t_primaryKey, t_columns...>::erase(uint16_t a_index)
 	ClearRowDefault(a_index);
 }
 
+//////////////////////////////
+// Iterator
+//////////////////////////////
+
 template<typename t_primaryKey, typename... t_columns>
 template<typename... t_columnsSubset>
 CR::Core::Table<t_primaryKey, t_columns...>::Iterator<t_columnsSubset...>::Iterator(Table& a_table, uint16_t a_index) :
-    m_table(a_table), m_index(a_index) {}
-
-/*
-template<typename t_primaryKey, typename... t_columns>
-template<typename... t_columnsSubset>
-auto CR::Core::Table<t_primaryKey, t_columns...>::Iterator<t_columnsSubset...>::operator*() const -> reference {
-    return std::get<t_column>(m_table.m_rows)[m_index];
+    m_table(a_table), m_index(a_index) {
+	while(m_index < c_maxSize && !m_table.m_used[m_index]) { ++m_index; }
 }
-
-template<typename t_primaryKey, typename... t_columns>
-template<typename t_column>
-auto CR::Core::Table<t_primaryKey, t_columns...>::Iterator<t_column>::operator->() const -> pointer {
-    return &std::get<t_column>(m_table.m_rows)[m_index];
-}*/
 
 template<typename t_primaryKey, typename... t_columns>
 template<typename... t_columnsSubset>
 auto CR::Core::Table<t_primaryKey, t_columns...>::Iterator<t_columnsSubset...>::operator++() -> Iterator& {
-	m_index = std::min(++m_index, c_maxSize);
+	if(m_index == c_maxSize) { return *this; }
+	++m_index;
 	while(m_index < c_maxSize && !m_table.m_used[m_index]) { ++m_index; }
-	/*value_type newValue(std::get<std::array<t_columnsSubset, c_maxSize>>(
-	    m_table.m_rows)[std::min<uint16_t>(m_index, c_maxSize - 1)]...);
-	std::swap(m_value, newValue);*/
 	return *this;
 }
 
@@ -328,6 +319,25 @@ template<typename... t_columnsSubset>
 auto CR::Core::Table<t_primaryKey, t_columns...>::Iterator<t_columnsSubset...>::operator++(int) -> Iterator& {
 	Iterator tmp = *this;
 	++(*this);
+	return tmp;
+}
+
+template<typename t_primaryKey, typename... t_columns>
+template<typename... t_columnsSubset>
+auto CR::Core::Table<t_primaryKey, t_columns...>::Iterator<t_columnsSubset...>::operator--() -> Iterator& {
+	if(m_index == 0) { return *this; }
+	uint16_t oldIndex = m_index;
+	--m_index;
+	while(m_index > 0 && !m_table.m_used[m_index]) { --m_index; }
+	if(!m_table.m_used[m_index]) { m_index = oldIndex; }
+	return *this;
+}
+
+template<typename t_primaryKey, typename... t_columns>
+template<typename... t_columnsSubset>
+auto CR::Core::Table<t_primaryKey, t_columns...>::Iterator<t_columnsSubset...>::operator--(int) -> Iterator& {
+	Iterator tmp = *this;
+	--(*this);
 	return tmp;
 }
 
@@ -343,30 +353,63 @@ auto CR::Core::Table<t_primaryKey, t_columns...>::Iterator<t_columnsSubset...>::
 	return pointer{(&std::get<std::array<t_columnsSubset, c_maxSize>>(m_table.m_rows)[m_index])...};
 }
 
+//////////////////////////////
+// ConstIterator
+//////////////////////////////
+
 template<typename t_primaryKey, typename... t_columns>
-template<typename t_column>
-auto CR::Core::Table<t_primaryKey, t_columns...>::ConstIterator<t_column>::operator*() const -> reference {
-	return std::get<t_column>(m_table.m_rows)[m_index];
+template<typename... t_columnsSubset>
+CR::Core::Table<t_primaryKey, t_columns...>::ConstIterator<t_columnsSubset...>::ConstIterator(Table& a_table,
+                                                                                              uint16_t a_index) :
+    m_table(a_table),
+    m_index(a_index) {
+	while(m_index < c_maxSize && !m_table.m_used[m_index]) { ++m_index; }
 }
 
 template<typename t_primaryKey, typename... t_columns>
-template<typename t_column>
-auto CR::Core::Table<t_primaryKey, t_columns...>::ConstIterator<t_column>::operator->() const -> pointer {
-	return &std::get<t_column>(m_table.m_rows)[m_index];
-}
-
-template<typename t_primaryKey, typename... t_columns>
-template<typename t_column>
-auto CR::Core::Table<t_primaryKey, t_columns...>::ConstIterator<t_column>::operator++() -> ConstIterator& {
-	m_index = std::min(++m_index, c_maxSize);
+template<typename... t_columnsSubset>
+auto CR::Core::Table<t_primaryKey, t_columns...>::ConstIterator<t_columnsSubset...>::operator++() -> ConstIterator& {
+	if(m_index == c_maxSize) { return *this; }
+	++m_index;
 	while(m_index < c_maxSize && !m_table.m_used[m_index]) { ++m_index; }
 	return *this;
 }
 
 template<typename t_primaryKey, typename... t_columns>
-template<typename t_column>
-auto CR::Core::Table<t_primaryKey, t_columns...>::ConstIterator<t_column>::operator++(int) -> ConstIterator& {
+template<typename... t_columnsSubset>
+auto CR::Core::Table<t_primaryKey, t_columns...>::ConstIterator<t_columnsSubset...>::operator++(int) -> ConstIterator& {
 	Iterator tmp = *this;
 	++(*this);
 	return tmp;
+}
+
+template<typename t_primaryKey, typename... t_columns>
+template<typename... t_columnsSubset>
+auto CR::Core::Table<t_primaryKey, t_columns...>::ConstIterator<t_columnsSubset...>::operator--() -> ConstIterator& {
+	if(m_index == 0) { return *this; }
+	uint16_t oldIndex = m_index;
+	--m_index;
+	while(m_index > 0 && !m_table.m_used[m_index]) { --m_index; }
+	if(!m_table.m_used[m_index]) { m_index = oldIndex; }
+	return *this;
+}
+
+template<typename t_primaryKey, typename... t_columns>
+template<typename... t_columnsSubset>
+auto CR::Core::Table<t_primaryKey, t_columns...>::ConstIterator<t_columnsSubset...>::operator--(int) -> ConstIterator& {
+	Iterator tmp = *this;
+	--(*this);
+	return tmp;
+}
+
+template<typename t_primaryKey, typename... t_columns>
+template<typename... t_columnsSubset>
+auto CR::Core::Table<t_primaryKey, t_columns...>::ConstIterator<t_columnsSubset...>::operator*() -> reference {
+	return reference{std::get<std::array<t_columnsSubset, c_maxSize>>(m_table.m_rows)[m_index]...};
+}
+
+template<typename t_primaryKey, typename... t_columns>
+template<typename... t_columnsSubset>
+auto CR::Core::Table<t_primaryKey, t_columns...>::ConstIterator<t_columnsSubset...>::operator->() -> pointer {
+	return pointer{(&std::get<std::array<t_columnsSubset, c_maxSize>>(m_table.m_rows)[m_index])...};
 }
